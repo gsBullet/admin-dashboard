@@ -1,6 +1,6 @@
-import React from 'react';
 
-const ComponentCard = ({
+
+const ComponentCard= ({
   title,
   children,
   className = "",

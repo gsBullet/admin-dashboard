@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const SidebarContext = createContext(undefined);
 
@@ -10,7 +10,6 @@ export const useSidebar = () => {
   }
   return context;
 };
- 
 
 export const SidebarProvider = ({ children }) => {
   const [isExpanded, setIsExpanded] = useState(true);

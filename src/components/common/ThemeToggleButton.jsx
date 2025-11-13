@@ -1,9 +1,7 @@
-import { useContext } from "react";
-import { ThemeContext } from "../../context/ThemeProvider";
+import { useTheme } from "../../context/ThemeContext";
 
-
- const ThemeToggleButton = () => {
-  const { toggleTheme } = useContext(ThemeContext);
+export const ThemeToggleButton = () => {
+  const { toggleTheme } = useTheme();
 
   return (
     <button
@@ -41,5 +39,3 @@ import { ThemeContext } from "../../context/ThemeProvider";
     </button>
   );
 };
-
-export default ThemeToggleButton;
