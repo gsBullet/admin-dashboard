@@ -15,11 +15,13 @@ export const addCategory = async (data) => {
     return error;
   }
 };
-export const getAllCategory = async () => {
+export const getAllCategory = async ({ page, limit }) => {
   try {
-    const response = await Axios.get("/api/category/all-category");
+    const response = await Axios.get(
+      `/category/all-category?page=${page}&limit=${limit}`
+    );
     if (response.data.data) {
-      return response.data;
+      return response.data.data;
     } else {
       return [];
     }
@@ -28,22 +30,29 @@ export const getAllCategory = async () => {
   }
 };
 
-export const updateCategory = async (data, id) => {
-  const response = await Axios.post(
-    `/api/category/update-category/${id}`,
-    data
-  );
-  return response;
+export const updateCategory = async ({ formData, id }) => {
+  try {
+    const response = await Axios.post(`/category/update-category/${id}`, {
+      name: formData.get("name"),
+    });
+    return response.data;
+  } catch (error) {
+    return error;
+  }
 };
-export const updateCategoryStatus = async (data, id) => {
-  const response = await Axios.post(
-    `/api/category/update-category-status/${id}`,
-    data
-  );
-  return response;
+export const updateCategoryStatus = async ({data, id}) => {
+  try {
+    const response = await Axios.post(
+      `/category/update-category-status/${id}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    return error;
+  }
 };
 
 export const deleteCategory = async (id) => {
-  const response = await Axios.get(`/api/category/delete-category/${id}`);
-  return response;
+  const response = await Axios.get(`/category/delete-category/${id}`);
+  return response.data;
 };

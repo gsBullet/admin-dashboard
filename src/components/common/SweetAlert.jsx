@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 
 const SweetAlert = ({ icon, title }) => {
+ 
   const Toast = Swal.mixin({
     toast: true,
     position: "bottom-end",
@@ -8,7 +9,9 @@ const SweetAlert = ({ icon, title }) => {
     timer: 1500,
     timerProgressBar: true,
     background: "#fff",
+
     didOpen: (toast) => {
+
       toast.onmouseenter = Swal.stopTimer;
       toast.onmouseleave = Swal.resumeTimer;
     },
