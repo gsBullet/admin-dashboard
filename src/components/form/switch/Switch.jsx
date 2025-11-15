@@ -39,14 +39,14 @@ const Switch = ({
 
   return (
     <label
-      className={`flex cursor-pointer select-none items-center gap-3 text-sm font-medium ${
+      className={`flex  select-none items-center gap-3 text-sm font-medium text-center justify-center  ${
         disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400"
       }`}
-      onClick={handleToggle} // Toggle when the label itself is clicked
+      // Toggle when the label itself is clicked
     >
-      <div className="relative">
+      <div className="relative cursor-pointer" onClick={handleToggle}>
         <div
-          className={`block transition duration-150 ease-linear h-6 w-11 rounded-full ${
+          className={`block  transition duration-150 ease-linear h-6 w-11 rounded-full ${
             disabled
               ? "bg-gray-100 pointer-events-none dark:bg-gray-800"
               : switchColors.background
@@ -56,7 +56,13 @@ const Switch = ({
           className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full shadow-theme-sm duration-150 ease-linear transform ${switchColors.knob}`}
         ></div>
       </div>
-      {defaultChecked? <label className="text-blue-800 border px-3 py-1 border-blue-800 dark:text-blue-400 dark:border-blue-800">{label}</label>:<label className="text-gray-700 dark:text-gray-400">{label}</label>} 
+      {defaultChecked ? (
+        <label className="text-blue-800  px-3 py-1 dark:text-blue-700 bg-blue-300  dark:bg-blue-100">
+          {label}
+        </label>
+      ) : (
+        <label className="text-red-700 dark:text-red-700 bg-red-300 px-3 py-1">{label}</label>
+      )}
     </label>
   );
 };

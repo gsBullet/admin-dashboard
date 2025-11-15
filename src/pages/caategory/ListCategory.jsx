@@ -19,7 +19,6 @@ import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
 
-
 const ListCategory = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -227,7 +226,10 @@ const ListCategory = () => {
                     </TableRow>
                   ) : (
                     categories.map((cat) => (
-                      <TableRow key={cat._id} className="text-center">
+                      <TableRow
+                        key={cat._id}
+                        className="text-center hover:bg-gray-100 dark:hover:bg-white/[0.03]"
+                      >
                         <TableCell className="px-4 py-3 text-gray-500   dark:text-gray-400">
                           {cat.name}
                         </TableCell>
@@ -250,6 +252,7 @@ const ListCategory = () => {
                               size="sm"
                               variant="primary"
                               onClick={() => handleEdit(cat)}
+                              disabled={cat.status === false}
                             >
                               Edit
                             </Button>
@@ -257,6 +260,7 @@ const ListCategory = () => {
                               size="sm"
                               variant="danger"
                               onClick={() => handleDelete(cat._id)}
+                              disabled={cat.status === true}
                             >
                               Delete
                             </Button>
@@ -291,7 +295,7 @@ const ListCategory = () => {
                 >
                   {pageSizeOptions.map((s) => (
                     <option key={s} value={s}>
-                      {s}
+                      <span className="text-gray-600">{s}</span>
                     </option>
                   ))}
                 </select>
