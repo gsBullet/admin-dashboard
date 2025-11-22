@@ -30,7 +30,15 @@ const navItems = [
     name: "Category",
     subItems: [
       { name: "Add Category", path: "/add-category", pro: false },
-      { name: "List Category", path: "/all-category", pro: false },
+      { name: "List of Category", path: "/all-category", pro: false },
+    ],
+  },
+  {
+    icon: <CalenderIcon />,
+    name: "product",
+    subItems: [
+      { name: "Add Product", path: "/add-product", pro: false },
+      { name: "List of Product", path: "/all-products", pro: false },
     ],
   },
   {

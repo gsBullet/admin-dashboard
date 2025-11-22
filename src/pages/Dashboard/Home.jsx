@@ -9,7 +9,7 @@ export default function Home() {
         description="This is React.js Ecommerce Dashboard"
       />
       <div className="">
-        <h1 className="text-7xl">Welcome to Dashboard</h1>
+        <h1 className="text-7xl dark:text-gray-400">Welcome to Dashboard</h1>
       </div>
     </>
   );

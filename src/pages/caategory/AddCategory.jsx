@@ -13,6 +13,8 @@ const AddCategory = () => {
     e.preventDefault();
     const formData = new FormData(e.target); // pass the form element itself
     const data = await addCategory(formData);
+    console.log(data);
+
     if (data?.data) {
       SweetAlert({
         icon: "success",
@@ -20,7 +22,10 @@ const AddCategory = () => {
       });
       e.target.reset();
     } else {
-      console.log(data.message);
+      SweetAlert({
+        icon: "error",
+        title: data.response.data.message,
+      });
     }
   };
   return (

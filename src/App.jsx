@@ -11,6 +11,8 @@ import ListCategory from "./pages/caategory/ListCategory";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import BasicTables from "./pages/Tables/BasicTables";
+import AddProduct from "./pages/products/AddProduct";
+import AllProducts from "./pages/products/AllProducts";
 
 export default function App() {
   return (
@@ -23,6 +25,9 @@ export default function App() {
             <Route index path="/" element={<Home />} />
             <Route path="/add-category" element={<AddCategory />} />
             <Route path="/all-category" element={<ListCategory />} />
+
+            <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/all-products" element={<AllProducts />} />
 
             {/* Others Page */}
             {/* <Route path="/profile" element={<UserProfiles />} />
