@@ -13,6 +13,7 @@ import SignUp from "./pages/AuthPages/SignUp";
 import BasicTables from "./pages/Tables/BasicTables";
 import AddProduct from "./pages/products/AddProduct";
 import AllProducts from "./pages/products/AllProducts";
+import UserProfiles from "./pages/UserProfiles";
 
 export default function App() {
   return (
@@ -30,8 +31,8 @@ export default function App() {
             <Route path="/all-products" element={<AllProducts />} />
 
             {/* Others Page */}
-            {/* <Route path="/profile" element={<UserProfiles />} />
-            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/profile" element={<UserProfiles />} />
+            {/* <Route path="/calendar" element={<Calendar />} />
             <Route path="/blank" element={<Blank />} /> */}
 
             {/* Forms */}

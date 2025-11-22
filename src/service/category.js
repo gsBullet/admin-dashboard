@@ -29,6 +29,20 @@ export const getAllCategory = async ({ page, limit }) => {
     return error;
   }
 };
+export const fetchAllCategoryForProduct = async () => {
+  try {
+    const response = await Axios.get(
+      `/category/all-category-for-product`
+    );
+    if (response.data.data) {
+      return response.data.data;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    return error;
+  }
+};
 
 export const updateCategory = async ({ formData, id }) => {
   try {
@@ -40,7 +54,7 @@ export const updateCategory = async ({ formData, id }) => {
     return error;
   }
 };
-export const updateCategoryStatus = async ({data, id}) => {
+export const updateCategoryStatus = async ({ data, id }) => {
   try {
     const response = await Axios.post(
       `/category/update-category-status/${id}`,

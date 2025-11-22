@@ -9,6 +9,9 @@ const Switch = ({
 }) => {
   const [isChecked, setIsChecked] = useState(defaultChecked);
 
+  console.log(onChange);
+  
+
   const handleToggle = () => {
     if (disabled) return;
     const newCheckedState = !isChecked;
@@ -17,6 +20,9 @@ const Switch = ({
       onChange(newCheckedState);
     }
   };
+  
+    const baseStyles =
+    "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium";
 
   const switchColors =
     color === "blue"
@@ -57,11 +63,11 @@ const Switch = ({
         ></div>
       </div>
       {defaultChecked ? (
-        <label className="text-blue-800  px-3 py-1 dark:text-blue-700 bg-blue-300  dark:bg-blue-100">
+        <label className={`${baseStyles} bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500`}>
           {label}
         </label>
       ) : (
-        <label className="text-red-700 dark:text-red-700 bg-red-300 px-3 py-1">{label}</label>
+        <label className={`${baseStyles} bg-error-50 text-error-600 dark:bg-error-500/15 dark:text-error-500`}>{label}</label>
       )}
     </label>
   );

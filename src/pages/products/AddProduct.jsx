@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import { getAllCategoryForProduct } from "../../service/product";
 import SweetAlert from "../../components/common/SweetAlert";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
@@ -7,6 +6,7 @@ import ComponentCard from "../../components/common/ComponentCard";
 import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import Axios from "../../service/Axios";
+import { fetchAllCategoryForProduct } from "../../service/category";
 
 const AddProduct = () => {
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ const AddProduct = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await getAllCategoryForProduct();
+      const res = await fetchAllCategoryForProduct();
       setCategories(res || []);
     } catch (err) {
       console.error(err);
