@@ -75,13 +75,13 @@ export const getProduct = async (id) => {
 
 export const updateProduct = async (id, formData) => {
   try {
-    const response = await Axios.put(`/products/${id}`, formData, {
+    const response = await Axios.post(`/product/update-product/${id}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
     if (response.data.data) {
-      return response.data.data;
+      return response.data;
     } else {
       return [];
     }
