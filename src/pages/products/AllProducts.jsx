@@ -16,6 +16,9 @@ import Switch from "../../components/form/switch/Switch";
 import TablePagination from "../Tables/TablePagination";
 import LoadingBtn from "../UiElements/LoadingBtn";
 import { fetchAllCategoryForProduct } from "../../service/category";
+import { Modal } from "../../components/ui/modal";
+import Label from "../../components/form/Label";
+import Input from "../../components/form/input/InputField";
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
@@ -30,6 +33,9 @@ const AllProducts = () => {
   const [searchCategory, setSearchCategory] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     const getCategory = async () => {
@@ -90,6 +96,14 @@ const AllProducts = () => {
       });
       setProducts(updatedProducts);
     }
+  };
+
+  const handleShowProduct = (product) => {
+    // Logic to show product details in a modal
+
+    console.log(product);
+    setIsOpen(true);
+    setSelectedProduct(product);
   };
 
   return (
@@ -296,7 +310,7 @@ const AllProducts = () => {
                         <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                           {product.available ? "Yes" : "No"}
                         </TableCell>
-
+                        {/* switch cell  */}
                         <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                           <Switch
                             size="sm"
@@ -317,16 +331,26 @@ const AllProducts = () => {
                         {/* action cells */}
                         <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                           <div className="flex gap-3">
-                            <button className="text-green-600  hover:bg-green-600  dark:text-green-400 px-1 py-1">
+                            <button
+                              onClick={() => handleShowProduct(product)}
+                              className="text-green-600  hover:bg-green-600  dark:text-green-400 px-1 py-1"
+                            >
                               <i
                                 className="fa fa-eye text-xl hover:text-white"
                                 aria-hidden="true"
                                 title="view"
                               ></i>
                             </button>
-                            <button className="text-blue-600  hover:bg-blue-600 dark:text-blue-400 px-1 py-1">
+                            <button
+                              disabled={product.status === false}
+                              className={`text-blue-600   dark:text-blue-400 px-1 py-1${
+                                product.status === false
+                                  ? " cursor-not-allowed opacity-30 "
+                                  : "hover:bg-blue-600 hover:text-white"
+                              }`}
+                            >
                               <i
-                                className="fa fa-edit text-xl hover:text-white"
+                                className="fa fa-edit text-xl "
                                 aria-hidden="true"
                                 title="edit"
                               ></i>
@@ -335,7 +359,7 @@ const AllProducts = () => {
                               disabled={product.status === true}
                               className={`text-red-600   px-1 py-1 ${
                                 product.status === true
-                                  ? " cursor-not-allowed opacity-50 "
+                                  ? " cursor-not-allowed opacity-30 "
                                   : "hover:bg-red-600 hover:text-white  "
                               }`}
                             >
@@ -366,6 +390,109 @@ const AllProducts = () => {
           </div>
         </ComponentCard>
       </div>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        className="max-w-[700px] m-4"
+      >
+        <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+          <div className="px-2 pr-14">
+            <div className="flex justify-center items-center gap-10">
+              <div className="relative-images">
+                <div className="flex flex-col gap-5">
+                  {selectedProduct?.related_images.map((image, index) => (
+                    <img
+                      key={index}
+                      width={300}
+                      height={300}
+                      src={import.meta.env.VITE_IMAGE_URL + image}
+                      alt={selectedProduct?.name}
+                      className="related-image"
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="thumbnail">
+                <img
+                  width={300}
+                  height={600}
+                  src={
+                    import.meta.env.VITE_IMAGE_URL + selectedProduct?.thumbnail
+                  }
+                  alt={selectedProduct?.name}
+                />
+              </div>
+            </div>
+            <h1 className=" text-xl font-medium text-gray-800  dark:text-white/90 mt-5">
+              Product ID: {selectedProduct?.id}
+            </h1>
+            <h3 className="mb-2 text-3xl font-semibold text-gray-800 dark:text-white/90 ">
+              {selectedProduct?.name}
+            </h3>
+            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
+              Update your details to keep your profile up-to-date.
+            </p>
+          </div>
+          <div className="product-price flex flex-row gap-10 mb-6">
+            <div className="old_price  ">
+              <Label>Old Price</Label>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {selectedProduct?.old_price}
+              </p>
+            </div>
+            <div className="new-price">
+              <Label>New Price</Label>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {selectedProduct?.new_price}
+              </p>
+            </div>
+            <div className="product-quantity">
+              <Label>Quantity</Label>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {selectedProduct?.quantity}
+              </p>
+            </div>
+            <div className="product-available">
+              <Label>Available</Label>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {selectedProduct?.available ? "Yes" : "No"}
+              </p>
+            </div>
+            <div className="product-status">
+              <Label>Status</Label>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {selectedProduct?.status ? "Yes" : "No"}
+              </p>
+            </div>
+          </div>
+          <div className="product-description">
+            <Label>Description</Label>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {selectedProduct?.description}
+            </p>
+          </div>
+          <div className="product-create-update flex flex-row gap-10 mt-6">
+            <div className="createAt">
+              <Label>Created At</Label>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                {new Date(selectedProduct?.createdAt).toLocaleString()}
+              </p>
+            </div>
+            <div className="updatedAt">
+              <Label>Updated At</Label>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {new Date(selectedProduct?.updatedAt).toLocaleString()}
+              </p>
+            </div>
+            <div className="user-profile">
+              <Label>Created By</Label>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {selectedProduct?.user?.name} S Profile
+              </p>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

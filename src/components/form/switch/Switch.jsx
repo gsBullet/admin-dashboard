@@ -9,7 +9,7 @@ const Switch = ({
 }) => {
   const [isChecked, setIsChecked] = useState(defaultChecked);
 
-  console.log(onChange);
+  // console.log(onChange);
   
 
   const handleToggle = () => {
