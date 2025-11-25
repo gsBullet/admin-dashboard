@@ -14,6 +14,7 @@ import {
   PlugInIcon,
   TableIcon,
   UserCircleIcon,
+  UsersIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
@@ -47,9 +48,20 @@ const navItems = [
     path: "/profile",
   },
   {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    name: "Users",
+    icon: <UsersIcon />,
+    subItems: [
+      { name: "Add User", path: "/add-user", pro: false },
+      { name: "List of Users", path: "/all-users", pro: false },
+    ],
+  },
+  {
+    name: "Users Role Management",
+    icon: <UsersIcon />,
+    subItems: [
+      { name: "Add User Role", path: "/add-user-role", pro: false },
+      { name: "List of User Roles", path: "/all-user-roles", pro: false },
+    ],
   },
   {
     name: "Tables",
@@ -336,7 +348,7 @@ const AppSidebar = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -352,7 +364,7 @@ const AppSidebar = () => {
             </div>
             <div className="">
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"

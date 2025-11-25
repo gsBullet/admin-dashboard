@@ -14,6 +14,11 @@ import BasicTables from "./pages/Tables/BasicTables";
 import AddProduct from "./pages/products/AddProduct";
 import AllProducts from "./pages/products/AllProducts";
 import UserProfiles from "./pages/UserProfiles";
+import AddUsers from "./pages/Users/AddUsers";
+import UserList from "./pages/Users/UserList";
+import AddUserRole from "./pages/UsersRole/AddUserRole";
+import UserRoleList from "./pages/UsersRole/UserRoleList";
+import Buttons from "./pages/UiElements/Buttons";
 
 export default function App() {
   return (
@@ -41,12 +46,20 @@ export default function App() {
             {/* Tables */}
             <Route path="/basic-tables" element={<BasicTables />} />
 
+            {/* ADD USERS */}
+            <Route path="/add-user" element={<AddUsers />} />
+            <Route path="/all-users" element={<UserList />} />
+
+            {/* user role */}
+            <Route path="/add-user-role" element={<AddUserRole />} />
+            <Route path="/all-user-roles" element={<UserRoleList />} />
+
             {/* Ui Elements */}
             {/* <Route path="/alerts" element={<Alerts />} />
             <Route path="/avatars" element={<Avatars />} />
-            <Route path="/badge" element={<Badges />} />
+            <Route path="/badge" element={<Badges />} /> */}
             <Route path="/buttons" element={<Buttons />} />
-            <Route path="/images" element={<Images />} />
+            {/* <Route path="/images" element={<Images />} />
             <Route path="/videos" element={<Videos />} /> */}
 
             {/* Charts */}
