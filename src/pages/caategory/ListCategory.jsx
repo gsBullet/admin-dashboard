@@ -18,6 +18,7 @@ import {
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
+import LoadingBtn from "../UiElements/LoadingBtn";
 
 const ListCategory = () => {
   const [categories, setCategories] = useState([]);
@@ -170,10 +171,10 @@ const ListCategory = () => {
       <div className="space-y-6">
         <ComponentCard title="Product Categories" className="text-center">
           {/* Table */}
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
             <div className="overflow-x-auto rounded-xl border ">
               <Table>
-                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                <TableHeader className="border-b border-gray-100 dark:border-white/5">
                   <TableRow className={"text-center"}>
                     <TableCell
                       isHeader
@@ -208,11 +209,11 @@ const ListCategory = () => {
                   </TableRow>
                 </TableHeader>
 
-                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.50]">
+                <TableBody className="divide-y divide-gray-100 dark:divide-white/50">
                   {loading ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center py-8">
-                        Loading...
+                        <LoadingBtn />
                       </TableCell>
                     </TableRow>
                   ) : categories.length === 0 ? (
