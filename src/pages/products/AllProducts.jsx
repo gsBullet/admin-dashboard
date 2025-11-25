@@ -42,7 +42,7 @@ const AllProducts = () => {
   const [loading, setLoading] = useState(false);
   const thumbnailInputRef = React.useRef(null);
   const imagesInputRef = React.useRef(null);
-    const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -51,6 +51,18 @@ const AllProducts = () => {
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [showNoData, setShowNoData] = useState(false);
+
+  console.log(showNoData);
+  
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowNoData(true);
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     const getCategory = async () => {
@@ -73,6 +85,7 @@ const AllProducts = () => {
     setCurrentPage(1);
     setLimit(10);
     setSearchTerm(search);
+    setShowNoData(false);
   };
 
   useEffect(() => {
@@ -118,12 +131,10 @@ const AllProducts = () => {
     setSelectedProduct(product);
   };
 
-
   const handleEditProduct = (product) => {
     setIsEditOpen(true);
     setSelectedProduct(product);
   };
-
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -199,11 +210,11 @@ const AllProducts = () => {
       // Use update endpoint instead of add-product
       const response = await updateProduct(selectedProduct._id, formData);
 
-      if (response?.data?.success) {
+      if (response?.success) {
         setIsEditOpen(false);
         SweetAlert({
           icon: "success",
-          title: response.data.message,
+          title: response.message,
         });
 
         // Refresh products list
@@ -221,7 +232,7 @@ const AllProducts = () => {
         SweetAlert({
           icon: "error",
           title: "Error",
-          text: response?.data?.message || "Failed to update product",
+          text: response?.message || "Failed to update product",
         });
       }
     } catch (error) {
@@ -229,7 +240,7 @@ const AllProducts = () => {
       SweetAlert({
         icon: "error",
         title: "Error",
-        text: error.response?.data?.message || "Failed to update product",
+        text: error.response?.message || "Failed to update product",
       });
     } finally {
       setLoading(false);
@@ -280,80 +291,84 @@ const AllProducts = () => {
               </select>
             </div>
           </div>
-          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
             <div className="max-w-full overflow-x-auto">
               {products.length === 0 ? (
-                <div className="flex justify-center items-center my-10 ">
-                  <LoadingBtn />
+                <div className="flex justify-center items-center my-10">
+                  {!showNoData ? (
+                    <LoadingBtn />
+                  ) : (
+                    <p className="text-gray-500 text-lg">No data found</p>
+                  )}
                 </div>
               ) : (
                 <Table className={""}>
                   {/* Table Header */}
-                  <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                  <TableHeader className="border-b border-gray-800 dark:border-white/90   ">
                     <TableRow className={"text-center"}>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         Product Id
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         Product Name
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         Category
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         Description
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         Old Price
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         New Price
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         Quantity
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         product Images
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         Available
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         Status
                       </TableCell>
                       <TableCell
                         isHeader
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
                         Actions
                       </TableCell>
@@ -362,7 +377,7 @@ const AllProducts = () => {
 
                   {/* Table Body */}
 
-                  <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                  <TableBody className="divide-y divide-gray-100 dark:divide-white/50">
                     {products?.map((product) => (
                       <TableRow key={product._id}>
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
@@ -396,11 +411,11 @@ const AllProducts = () => {
                             ${product.new_price}
                           </span>
                         </TableCell>
-                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                        <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
                           {product.quantity}
                         </TableCell>
 
-                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                        <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
                           <div className="flex flex-col justify-center items-center gap-3">
                             <div className="w-10 h-10 overflow-hidden rounded-full">
                               <img
@@ -437,11 +452,11 @@ const AllProducts = () => {
                           </div>
                         </TableCell>
 
-                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                        <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
                           {product.available ? "Yes" : "No"}
                         </TableCell>
                         {/* switch cell  */}
-                        <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                        <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
                           <Switch
                             size="sm"
                             color={
@@ -635,7 +650,7 @@ const AllProducts = () => {
       >
         <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
           <div className="px-2 pr-14">
-            <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
+            <h4 className="mb-10 text-4xl font-semibold text-gray-800 dark:text-white/90 text-center ">
               Edit Product Information
             </h4>
           </div>

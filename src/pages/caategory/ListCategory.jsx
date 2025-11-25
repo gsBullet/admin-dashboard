@@ -286,7 +286,7 @@ const ListCategory = () => {
               </div>
 
               {/* Per page */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
                 <span className="text-sm text-gray-600">Per page:</span>
                 <select
                   value={limit}
