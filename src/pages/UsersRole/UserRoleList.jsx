@@ -11,12 +11,24 @@ import {
 } from "../../components/ui/table";
 import LoadingBtn from "../UiElements/LoadingBtn";
 import Button from "../../components/ui/button/Button";
-import { getAllUserRoles } from "../../service/userRole";
+import {
+  deleteUserRole,
+  getAllUserRoles,
+  updateUserRole,
+  updateUserRoleStatus,
+} from "../../service/userRole";
 import Switch from "../../components/form/switch/Switch";
+import { Modal } from "../../components/ui/modal";
+import SweetAlert from "../../components/common/SweetAlert";
+import Label from "../../components/form/Label";
+import Input from "../../components/form/input/InputField";
+import { UserCircleIcon } from "../../icons";
 
 const UserRoleList = () => {
   const [loading, setLoading] = useState(false);
   const [userRoles, setUserRoles] = useState([]);
+  const [selectRole, setSelectRole] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const fetchUserRoles = async () => {
     setLoading(true);
@@ -36,7 +48,93 @@ const UserRoleList = () => {
   useEffect(() => {
     fetchUserRoles();
   }, []);
-  
+
+  const handleEdit = (role) => {
+    setSelectRole(role);
+    setIsOpen(true);
+    // Implement edit functionality here
+    console.log("Edit role:", role);
+  };
+  const handleSubmitUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("userRole", selectRole.userRole);
+    // Call update API here with formData and selectRole._id
+    const data = await updateUserRole(selectRole._id, formData);
+    if (data?.success) {
+      SweetAlert({
+        icon: "success",
+        title: data.message,
+      });
+      setIsOpen(false);
+      setLoading(false);
+      const response = await getAllUserRoles();
+      setUserRoles(response.data);
+    } else {
+      SweetAlert({
+        icon: "error",
+        title: data.response.data.message,
+      });
+    }
+  };
+
+  const toggoleStatus = async (role) => {
+    console.log(role);
+
+    // setLoading(true);
+    try {
+      // Call update API here with formData and selectRole._id
+      const data = await updateUserRoleStatus({
+        id: role._id,
+        status: !role.status,
+      });
+
+      if (data?.success) {
+        SweetAlert({
+          icon: "success",
+          title: data.message,
+        });
+
+        setUserRoles(
+          userRoles.map((r) =>
+            r._id === role._id ? { ...r, status: !r.status } : r
+          )
+        );
+      } else {
+        SweetAlert({
+          icon: "error",
+          title: data.response.data.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating role status:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    // Call delete API here with id
+    try {
+      const data = await deleteUserRole(id);
+      if (data?.success) {
+        SweetAlert({
+          icon: "success",
+          title: data.message,
+        });
+        const response = await getAllUserRoles();
+        setUserRoles(response.data);
+      } else {
+        SweetAlert({
+          icon: "error",
+          title: data.response.data.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting role:", error);
+    }
+  };
 
   return (
     <div>
@@ -112,7 +210,7 @@ const UserRoleList = () => {
                         <Switch
                           defaultChecked={role.status}
                           label={role.status ? "Active" : "Inactive"}
-                          // onChange={() => toggoleStatus(role)}
+                          onChange={() => toggoleStatus(role)}
                         />
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500   dark:text-gray-400">
@@ -120,7 +218,7 @@ const UserRoleList = () => {
                           <Button
                             size="sm"
                             variant="primary"
-                            // onClick={() => handleEdit(cat)}
+                            onClick={() => handleEdit(role)}
                             disabled={role.status === false}
                           >
                             Edit
@@ -128,7 +226,7 @@ const UserRoleList = () => {
                           <Button
                             size="sm"
                             variant="danger"
-                            // onClick={() => handleDelete(cat._id)}
+                            onClick={() => handleDelete(role._id)}
                             disabled={role.status === true}
                           >
                             Delete
@@ -143,6 +241,47 @@ const UserRoleList = () => {
           )}
         </>
       </ComponentCard>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        title="Edit User Role"
+        className=" max-w-xl m-4"
+      >
+        <div className="space-y-6">
+          <div className="no-scrollbar relative w-full overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11 mt-10">
+            <form onSubmit={handleSubmitUpdate}>
+              {/* full name  */}
+              <div>
+                <Label htmlFor={"userRole"} className={"text-start"}>
+                  User Role
+                </Label>
+                <div className="relative">
+                  <Input
+                    placeholder="User role"
+                    type="text"
+                    className="pl-[62px]"
+                    name="userRole"
+                    id="userRole"
+                    value={selectRole?.userRole}
+                    onChange={(e) =>
+                      setSelectRole({
+                        ...selectRole,
+                        userRole: e.target.value,
+                      })
+                    }
+                  />
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 border-r border-gray-200 px-3.5 py-3 text-gray-500 dark:border-gray-800 dark:text-gray-400">
+                    <UserCircleIcon className="size-6" />
+                  </span>
+                </div>
+              </div>
+              <div className="text-end mt-5">
+                <Button type="submit">update Role</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
