@@ -4,13 +4,14 @@ import SignInForm from "../../components/auth/SignInForm";
 import PageMeta from "../../components/common/PageMeta";
 
 export default function SignIn() {
+  
   return (
     <>
       <PageMeta
         title="SignIn"
         description="This is React.js SignIn Tables Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
       />
-      <AuthLayout>
+      <AuthLayout >
         <SignInForm />
       </AuthLayout>
     </>
