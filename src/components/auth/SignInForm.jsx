@@ -6,18 +6,50 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 import { singinUser } from "../../service/auth";
+import SweetAlert from "../common/SweetAlert";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const singInHandler = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("email", e.target.email.value);
-    formData.append("password", e.target.password.value);
-    const response = await singinUser(formData);
-    console.log(response);
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("email", e.target.email.value);
+      formData.append("password", e.target.password.value);
+      const response = await singinUser(formData);
+      console.log(response);
+      // console.log(response.response.data.message);
+
+      if (response.success) {
+        localStorage.setItem(
+          "ecom",
+          JSON.stringify({ token: response.token, userData: response.userData })
+        );
+        e.target.reset();
+        SweetAlert({
+          icon: "success",
+          title: response.message,
+        });
+      } else {
+        SweetAlert({
+          icon: "error",
+          title: response.response.data.message,
+        });
+      }
+    } catch (error) {
+      console.log("error", error);
+
+      SweetAlert({
+        icon: "error",
+        title: error.request.data.message,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div className="flex flex-1 ">
@@ -134,7 +166,7 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm">
+                  <Button disabled={loading} className="w-full" size="sm">
                     Sign in
                   </Button>
                 </div>
