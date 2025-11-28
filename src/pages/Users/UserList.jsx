@@ -225,7 +225,7 @@ const UserList = () => {
                       className="text-center hover:bg-gray-100 dark:hover:bg-white/3"
                     >
                       <TableCell className="px-4 py-3 text-gray-500   dark:text-gray-400">
-                        {role.fullName}
+                        {role.firstName} {role.lastName}
                       </TableCell>
                       <TableCell className="px-4 py-3 text-gray-500   dark:text-gray-400">
                         {role.userRole}

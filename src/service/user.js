@@ -4,7 +4,8 @@ import Axios from "./Axios";
 export const addUser = async (data) => {
   try {
     const response = await Axios.post("/user/add-user", {
-      fullName: data.get("fullName"),
+      firstName: data.get("firstName"),
+      lastName: data.get("lastName"),
       email: data.get("email"),
       phone: data.get("phone"),
       userRole: data.get("userRole"),
@@ -35,7 +36,8 @@ export const getAllUsers = async () => {
 export const updateUser = async (id, data) => {
   try {
     const response = await Axios.post(`/user/update-user/${id}`, {
-      userName: data.get("userName"),
+      firstName: data.get("firstName"),
+      lastName: data.get("lastName"),
       email: data.get("email"),
       phone: data.get("phone"),
       userRole: data.get("userRole"),

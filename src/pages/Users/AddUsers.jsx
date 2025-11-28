@@ -41,7 +41,8 @@ const AddUsers = () => {
     setLoading(true);
     // Handle form submission logic here
     const formData = new FormData();
-    formData.append("fullName", e.target.fullName.value);
+    formData.append("firstName", e.target.firstName.value);
+    formData.append("lastName", e.target.lastName.value);
     formData.append("email", e.target.email.value);
     formData.append("phone", e.target.phone.value);
     formData.append("userRole", e.target.userRole.value);
@@ -78,19 +79,37 @@ const AddUsers = () => {
       <PageBreadcrumb pageTitle="Add Users" />
       <ComponentCard title="Add User" className="max-w-xl m-auto text-center">
         <form className="space-y-6" onSubmit={userSubmitHandler}>
-          {/* full name  */}
+          {/* First name  */}
           <div>
-            <Label htmlFor={"fullName"} className={"text-start"}>
-              Full Name
+            <Label htmlFor={"firstName"} className={"text-start"}>
+              First Name
             </Label>
             <div className="relative">
               <Input
                 placeholder="Enter Your full name"
                 type="text"
                 className="pl-[62px]"
-                name="fullName"
+                name="firstName"
                 required
-                id={"fullName"}
+                id={"firstName"}
+              />
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 border-r border-gray-200 px-3.5 py-3 text-gray-500 dark:border-gray-800 dark:text-gray-400">
+                <UserCircleIcon className="size-6" />
+              </span>
+            </div>
+          </div>
+          <div>
+            <Label htmlFor={"lastName"} className={"text-start"}>
+              Last Name
+            </Label>
+            <div className="relative">
+              <Input
+                placeholder="Enter Your full name"
+                type="text"
+                className="pl-[62px]"
+                name="lastName"
+                required
+                id={"lastName"}
               />
               <span className="absolute left-0 top-1/2 -translate-y-1/2 border-r border-gray-200 px-3.5 py-3 text-gray-500 dark:border-gray-800 dark:text-gray-400">
                 <UserCircleIcon className="size-6" />
@@ -133,7 +152,7 @@ const AddUsers = () => {
                 hint="Must start with 0 and max 11 digits"
                 pattern="^0\d{0,10}$"
               />
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 border-r border-gray-200 px-3.5 py-3 text-gray-500 dark:border-gray-800 dark:text-gray-400">
+              <span className="absolute left-0 top-1/3 -translate-y-1/2 border-r border-gray-200 px-3.5 py-3 text-gray-500 dark:border-gray-800 dark:text-gray-400">
                 <UserCircleIcon className="size-6" />
               </span>
             </div>
