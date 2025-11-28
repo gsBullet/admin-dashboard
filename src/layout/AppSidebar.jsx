@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, } from "react-router";
 
 // Assume these icons are imported from an icon library
 import {
@@ -17,7 +17,7 @@ import {
   UsersIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-import SidebarWidget from "./SidebarWidget";
+
 
 const navItems = [
   {
@@ -110,12 +110,16 @@ const othersItems = [
 ];
 
 const AppSidebar = () => {
+ 
+
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [subMenuHeight, setSubMenuHeight] = useState({});
   const subMenuRefs = useRef({});
+
+
 
   // const isActive = (path: string) => location.pathname === path;
   const isActive = useCallback(

@@ -45,6 +45,7 @@ const Input = ({
         disabled={disabled}
         className={inputClasses}
         pattern={pattern}
+        required
       />
 
       {hint && (

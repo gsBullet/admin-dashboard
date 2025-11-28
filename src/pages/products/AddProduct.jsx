@@ -7,21 +7,24 @@ import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import Axios from "../../service/Axios";
 import { fetchAllCategoryForProduct } from "../../service/category";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 const AddProduct = () => {
+  const { auth } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  
+
   // Refs for file inputs
   const thumbnailInputRef = useRef(null);
   const imagesInputRef = useRef(null);
 
   const fetchCategories = async () => {
     try {
-      const res = await fetchAllCategoryForProduct();
+      const res = await fetchAllCategoryForProduct(auth.token);
       setCategories(res || []);
     } catch (err) {
       console.error(err);
@@ -130,11 +133,10 @@ const AddProduct = () => {
       const response = await Axios.post("/product/add-product", formData, {
         timeout: 30000,
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
       console.log(response);
-      
 
       if (response?.data?.success) {
         SweetAlert({

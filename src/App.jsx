@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  // useNavigate,
+} from "react-router";
 
 import NotFound from "./pages/OtherPage/NotFound";
 
@@ -19,16 +24,37 @@ import UserList from "./pages/Users/UserList";
 import AddUserRole from "./pages/UsersRole/AddUserRole";
 import UserRoleList from "./pages/UsersRole/UserRoleList";
 import Buttons from "./pages/UiElements/Buttons";
+// import { useEffect } from "react";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
 
 export default function App() {
+  const { auth } = useContext(AuthContext);
+  // const navigate = useNavigate();
+  // useEffect(() => {
+  //   const storedPath = sessionStorage.getItem("authPrevlink") || "/";
+  //   const pathName = window?.authPrevlink?.pathname || storedPath;
+
+  //   if (auth?.checkAuth && pathName) {
+  //     navigate(pathName);
+  //     sessionStorage.setItem("authPrevlink", pathName); // Store the last visited path
+  //   } else if (auth?.checkAuth) {
+  //     navigate("/dashboard");
+  //   } else {
+  //     navigate("/");
+  //   }
+
+  //   // Optionally, remove the global variable if no longer needed
+  //   // delete window.authPrevlink;
+  // }, [auth, navigate]);
   return (
     <>
       <Router>
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
-            <Route index path="/dashboard" element={<Home />} />
+          <Route element={auth?.checkAuth ? <AppLayout /> : <SignIn />}>
+            <Route index path="/" element={<Home />} />
             <Route path="/add-category" element={<AddCategory />} />
             <Route path="/all-category" element={<ListCategory />} />
 

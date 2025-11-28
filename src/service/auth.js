@@ -15,3 +15,21 @@ export const singinUser = async (data) => {
     return error;
   }
 };
+export const checkUserAuth = (token) => {
+  try {
+    const response = Axios.get("/auth/check-auth", {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    });
+    console.log(response);
+    
+    if (response.data) {
+      return response.data;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    return error;
+  }
+};

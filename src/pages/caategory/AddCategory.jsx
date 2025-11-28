@@ -7,13 +7,16 @@ import Button from "../../components/ui/button/Button";
 import { addCategory } from "../../service/category";
 import Input from "../../components/form/input/InputField";
 import SweetAlert from "../../components/common/SweetAlert";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 const AddCategory = () => {
+  const { auth } = useContext(AuthContext);
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target); // pass the form element itself
+    const formData = new FormData(e.target);
+    formData.append("token", auth.token);
     const data = await addCategory(formData);
-    console.log(data);
 
     if (data?.data) {
       SweetAlert({

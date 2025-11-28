@@ -19,8 +19,11 @@ import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
 import LoadingBtn from "../UiElements/LoadingBtn";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 const ListCategory = () => {
+  const { auth } = useContext(AuthContext);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -42,7 +45,12 @@ const ListCategory = () => {
     setLoading(true);
     try {
       const res = await Axios.get(
-        `/category/all-category?page=${page}&limit=${size}`
+        `/category/all-category?page=${page}&limit=${size}`,
+        {
+          headers: {
+            authorization: `EcomToken ${auth.token}`,
+          },
+        }
       );
 
       // Most backends return one of these two shapes
@@ -79,7 +87,7 @@ const ListCategory = () => {
       const fd = new FormData();
       fd.append("name", categoryName);
 
-      await updateCategory(editingCategory._id, fd);
+      await updateCategory(editingCategory._id, fd, auth.token);
 
       SweetAlert({ icon: "success", title: "Category updated!" });
       setCategories((prev) =>
@@ -126,7 +134,7 @@ const ListCategory = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await deleteCategory(id);
+      await deleteCategory({ id, token: auth.token });
       SweetAlert({ icon: "success", title: "Deleted!" });
 
       // Remove from UI
