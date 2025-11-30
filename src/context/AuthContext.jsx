@@ -15,30 +15,23 @@ const AuthContextProvider = ({ children }) => {
 
   console.log("userInfo", userInfo);
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const token = await JSON.parse(localStorage.getItem("ecom"));
-      const response = await checkUserAuth(token);
-      console.log("response", response);
-      console.log("token", token);
+  const checkUser = async () => {
+    const token = await JSON.parse(localStorage.getItem("ecom"));
+    const response = await checkUserAuth(token);
+    // console.log("response", response);
+    // console.log("token", token);
 
-      if (response) {
-        setAuth({
-          checkAuth: true,
-          token: token,
-        });
-        setUserInfo(response.data);
-      } else {
-        localStorage.removeItem("ecom");
-        setAuth({
-          checkAuth: false,
-          token: "",
-        });
-        setUserInfo({});
-      }
-    };
+    if (token && response.success) {
+      setAuth({
+        checkAuth: true,
+        token: token,
+      });
+      setUserInfo(response.data);
+    }
+  };
+  useEffect(() => {
     checkUser();
-  }, []); // run once
+  }, [auth.checkAuth]); // run once
 
   const logout = () => {
     localStorage.removeItem("ecom");

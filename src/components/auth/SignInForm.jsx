@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
@@ -11,6 +11,7 @@ import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 export default function SignInForm() {
+  const navigate = useNavigate()
   const { setAuth, setUserInfo } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
@@ -38,8 +39,10 @@ export default function SignInForm() {
           icon: "success",
           title: response.message,
         });
-
+        navigate("/");
         e.target.reset();
+        setLoading(false);
+
       } else {
         SweetAlert({
           icon: "error",

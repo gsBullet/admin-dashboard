@@ -56,7 +56,7 @@ const navItems = [
     ],
   },
   {
-    name: "Users Role Management",
+    name: "Role Management",
     icon: <UsersIcon />,
     subItems: [
       { name: "Add User Role", path: "/add-user-role", pro: false },

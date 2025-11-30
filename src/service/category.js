@@ -40,7 +40,7 @@ export const addCategory = async (data) => {
 //     return error;
 //   }
 // };
-export const fetchAllCategoryForProduct = async (token) => {
+export const fetchAllCategoryForProduct = async ({token}) => {
   try {
     const response = await Axios.get(`/category/all-category-for-product`, {
       headers: {

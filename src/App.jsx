@@ -27,75 +27,64 @@ import Buttons from "./pages/UiElements/Buttons";
 // import { useEffect } from "react";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
+import HomeLayout from "./layout/homeLayout/HomeLayout";
 
 export default function App() {
   const { auth } = useContext(AuthContext);
-  // const navigate = useNavigate();
-  // useEffect(() => {
-  //   const storedPath = sessionStorage.getItem("authPrevlink") || "/";
-  //   const pathName = window?.authPrevlink?.pathname || storedPath;
 
-  //   if (auth?.checkAuth && pathName) {
-  //     navigate(pathName);
-  //     sessionStorage.setItem("authPrevlink", pathName); // Store the last visited path
-  //   } else if (auth?.checkAuth) {
-  //     navigate("/dashboard");
-  //   } else {
-  //     navigate("/");
-  //   }
-
-  //   // Optionally, remove the global variable if no longer needed
-  //   // delete window.authPrevlink;
-  // }, [auth, navigate]);
   return (
     <>
       <Router>
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
-          <Route element={auth?.checkAuth ? <AppLayout /> : <SignIn />}>
-            <Route index path="/" element={<Home />} />
-            <Route path="/add-category" element={<AddCategory />} />
-            <Route path="/all-category" element={<ListCategory />} />
 
-            <Route path="/add-product" element={<AddProduct />} />
-            <Route path="/all-products" element={<AllProducts />} />
+          {auth.checkAuth && auth.token ? (
+            <Route path="/" element={<AppLayout />}>
+              <Route index element={<Home />} />
+              <Route path="/add-category" element={<AddCategory />} />
+              <Route path="/all-category" element={<ListCategory />} />
 
-            {/* Others Page */}
-            <Route path="/profile" element={<UserProfiles />} />
-            {/* <Route path="/calendar" element={<Calendar />} />
+              <Route path="/add-product" element={<AddProduct />} />
+              <Route path="/all-products" element={<AllProducts />} />
+
+              {/* Others Page */}
+              <Route path="/profile" element={<UserProfiles />} />
+              {/* <Route path="/calendar" element={<Calendar />} />
             <Route path="/blank" element={<Blank />} /> */}
 
-            {/* Forms */}
-            <Route path="/form-elements" element={<FormElements />} />
+              {/* Forms */}
+              <Route path="/form-elements" element={<FormElements />} />
 
-            {/* Tables */}
-            <Route path="/basic-tables" element={<BasicTables />} />
+              {/* Tables */}
+              <Route path="/basic-tables" element={<BasicTables />} />
 
-            {/* ADD USERS */}
-            <Route path="/add-user" element={<AddUsers />} />
-            <Route path="/all-users" element={<UserList />} />
+              {/* ADD USERS */}
+              <Route path="/add-user" element={<AddUsers />} />
+              <Route path="/all-users" element={<UserList />} />
 
-            {/* user role */}
-            <Route path="/add-user-role" element={<AddUserRole />} />
-            <Route path="/all-user-roles" element={<UserRoleList />} />
+              {/* user role */}
+              <Route path="/add-user-role" element={<AddUserRole />} />
+              <Route path="/all-user-roles" element={<UserRoleList />} />
 
-            {/* Ui Elements */}
-            {/* <Route path="/alerts" element={<Alerts />} />
+              {/* Ui Elements */}
+              {/* <Route path="/alerts" element={<Alerts />} />
             <Route path="/avatars" element={<Avatars />} />
             <Route path="/badge" element={<Badges />} /> */}
-            <Route path="/buttons" element={<Buttons />} />
-            {/* <Route path="/images" element={<Images />} />
+              <Route path="/buttons" element={<Buttons />} />
+              {/* <Route path="/images" element={<Images />} />
             <Route path="/videos" element={<Videos />} /> */}
 
-            {/* Charts */}
-            {/* <Route path="/line-chart" element={<LineChart />} />
+              {/* Charts */}
+              {/* <Route path="/line-chart" element={<LineChart />} />
             <Route path="/bar-chart" element={<BarChart />} /> */}
-          </Route>
-
-          {/* Auth Layout */}
-          <Route path="/" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
+            </Route>
+          ) : (
+            <Route path="/" element={<HomeLayout />}>
+              <Route index element={<SignIn />} />
+              <Route path="/sign-up" element={<SignUp />} />
+            </Route>
+          )}
 
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />

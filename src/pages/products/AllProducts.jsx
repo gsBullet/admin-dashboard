@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import ComponentCard from "../../components/common/ComponentCard";
-import BasicTableOne from "../../components/tables/BasicTables/BasicTableOne";
 import {
   Table,
   TableBody,
@@ -12,6 +11,7 @@ import {
 import Badge from "../../components/ui/badge/Badge";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import {
+  deleteProduct,
   getAllProducts,
   updateProduct,
   updateProductStatus,
@@ -25,9 +25,10 @@ import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
 import Button from "../../components/ui/button/Button";
 import SweetAlert from "../../components/common/SweetAlert";
-import Axios from "../../service/Axios";
+import { AuthContext } from "../../context/AuthContext";
 
 const AllProducts = () => {
+  const { auth } = useContext(AuthContext);
   const [products, setProducts] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,11 +51,7 @@ const AllProducts = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [showNoData, setShowNoData] = useState(false);
-
-  console.log(showNoData);
-  
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -64,13 +61,14 @@ const AllProducts = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // fetchAllCategoryForProduct
   useEffect(() => {
     const getCategory = async () => {
-      const data = await fetchAllCategoryForProduct();
+      const data = await fetchAllCategoryForProduct({ token: auth.token });
       setCategory(data);
     };
     getCategory();
-  }, []);
+  }, [auth.token]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -88,6 +86,8 @@ const AllProducts = () => {
     setShowNoData(false);
   };
 
+  // fetch all products
+
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await getAllProducts({
@@ -98,6 +98,7 @@ const AllProducts = () => {
         available: available,
         sort: "createdAt",
         order: "desc",
+        token: auth.token,
       });
       setProducts(response.data);
       setTotalProducts(response.pagination.totalProducts);
@@ -108,8 +109,11 @@ const AllProducts = () => {
   }, [currentPage, limit, searchTerm, available, sort, order, searchCategory]);
 
   const changeStatus = async ({ product, checked }) => {
-    const response = await updateProductStatus(product._id, {
+
+    const response = await updateProductStatus({
+      id: product._id,
       status: checked,
+      token: auth.token,
     });
 
     if (response.success === true) {
@@ -135,19 +139,6 @@ const AllProducts = () => {
     setIsEditOpen(true);
     setSelectedProduct(product);
   };
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetchAllCategoryForProduct();
-        setCategories(res || []);
-      } catch (err) {
-        console.error(err);
-        SweetAlert({ icon: "error", title: "Failed to load categories" });
-      }
-    };
-    fetchCategories();
-  }, []);
 
   const removeImagePreview = (index) => {
     const newPreviews = imagePreviews.filter((_, i) => i !== index);
@@ -208,8 +199,11 @@ const AllProducts = () => {
 
     try {
       // Use update endpoint instead of add-product
-      const response = await updateProduct(selectedProduct._id, formData);
-
+      const response = await updateProduct(
+        selectedProduct._id,
+        formData,
+        auth.token
+      );
       if (response?.success) {
         setIsEditOpen(false);
         SweetAlert({
@@ -224,8 +218,9 @@ const AllProducts = () => {
           search: searchTerm,
           category: searchCategory,
           available: available,
-          sort: "createdAt",
+          sort: "updatedAt",
           order: "desc",
+          token: auth.token,
         });
         setProducts(updatedResponse.data);
       } else {
@@ -244,6 +239,27 @@ const AllProducts = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    const response = await deleteProduct({ id, token: auth.token });
+    if (response?.success) {
+      SweetAlert({
+        icon: "success",
+        title: response.message,
+      });
+      const updatedResponse = await getAllProducts({
+        page: currentPage,
+        limit: limit,
+        search: searchTerm,
+        category: searchCategory,
+        available: available,
+        sort: "createdAt",
+        order: "desc",
+        token: auth.token,
+      });
+      setProducts(updatedResponse.data);
     }
   };
 
@@ -503,6 +519,7 @@ const AllProducts = () => {
                             </button>
                             <button
                               disabled={product.status === true}
+                              onClick={() => handleDeleteProduct(product._id)}
                               className={`text-red-600   px-1 py-1 ${
                                 product.status === true
                                   ? " cursor-not-allowed opacity-30 "
@@ -725,7 +742,7 @@ const AllProducts = () => {
                 }
                 rows="3"
                 required
-                className="w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs focus:outline-hidden bg-transparent text-gray-900 dark:text-gray-300 text-gray-900 border-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                className="w-full rounded-lg border px-4 py-2.5 text-sm shadow-theme-xs focus:outline-hidden bg-transparent  text-gray-900 border-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
               />
             </div>
 
@@ -808,7 +825,7 @@ const AllProducts = () => {
                 required
               >
                 <option value="">Select a category</option>
-                {categories?.map((category) => (
+                {category?.map((category) => (
                   <option
                     key={category._id}
                     value={category._id}
@@ -855,7 +872,7 @@ const AllProducts = () => {
               </label>
               <input
                 ref={thumbnailInputRef}
-                className="focus:border-ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pl-3.5 file:pr-3 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden focus:file:ring-brand-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"
+                className="focus:border-ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pl-3.5 file:pr-3 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden focus:file:ring-brand-300 dark:border-gray-700 dark:bg-gray-900  dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/3 dark:file:text-gray-400 dark:placeholder:text-gray-400"
                 accept="image/*"
                 type="file"
                 name="thumbnail"
@@ -926,7 +943,7 @@ const AllProducts = () => {
                     setImagePreviews(newPreviews);
                   }
                 }}
-                className="focus:border-ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pl-3.5 file:pr-3 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden focus:file:ring-brand-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"
+                className="focus:border-ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pl-3.5 file:pr-3 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden focus:file:ring-brand-300 dark:border-gray-700 dark:bg-gray-900  dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/3 dark:file:text-gray-400 dark:placeholder:text-gray-400"
               />
 
               {/* Images Preview */}

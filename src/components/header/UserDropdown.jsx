@@ -6,8 +6,7 @@ import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 
 export default function UserDropdown() {
-  const { auth, logout } = useContext(AuthContext);
-  console.log(auth);
+  const {  logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
 
   function toggleDropdown() {

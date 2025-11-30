@@ -1,6 +1,5 @@
 import Axios from "./Axios";
 
-
 export const getAllProducts = async ({
   page,
   limit,
@@ -9,10 +8,16 @@ export const getAllProducts = async ({
   available,
   sort,
   order,
+  token,
 }) => {
   try {
     const response = await Axios.get(
-      `/product/all-products?page=${page}&limit=${limit}&search=${search}&category=${category}&available=${available}&sort=${sort}&order=${order}`
+      `/product/all-products?page=${page}&limit=${limit}&search=${search}&category=${category}&available=${available}&sort=${sort}&order=${order}`,
+      {
+        headers: {
+          authorization: `EcomToken ${token}`,
+        },
+      }
     );
     if (response.data.data) {
       return response.data;
@@ -73,41 +78,58 @@ export const getProduct = async (id) => {
   }
 };
 
-export const updateProduct = async (id, formData) => {
+export const updateProduct = async (id, formData, token) => {
   try {
-    const response = await Axios.post(`/product/update-product/${id}`, formData, {
+    const response = await Axios.post(
+      `/product/update-product/${id}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `EcomToken ${token}`,
+        },
+      }
+    );
+    if (response.data.data) {
+      return response.data;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
+export const updateProductStatus = async ({ id, status, token }) => {
+  try {
+    const response = await Axios.post(
+      `/product/update-product-status/${id}`,
+      { status },
+      {
+        headers: {
+          authorization: `EcomToken ${token}`,
+        },
+      }
+    );
+    if (response.data.data) {
+      return response.data;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    return error;
+  }
+};
+
+export const deleteProduct = async ({ id, token }) => {
+  try {
+    const response = await Axios.get(`/product/delete-product/${id}`, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        authorization: `EcomToken ${token}`,
       },
     });
-    if (response.data.data) {
+    if (response.data) {
       return response.data;
-    } else {
-      return [];
-    }
-  } catch (error) {
-    return error;
-  }
-};
-
-export const updateProductStatus = async (id, data) => {
-  try {
-    const response = await Axios.post(`/product/update-product-status/${id}`, data);
-    if (response.data.data) {
-      return response.data;
-    } else {
-      return [];
-    }
-  } catch (error) {
-    return error;
-  }
-};
-
-export const deleteProduct = async (id) => {
-  try {
-    const response = await Axios.delete(`/products/${id}`);
-    if (response.data.data) {
-      return response.data.data;
     } else {
       return [];
     }
