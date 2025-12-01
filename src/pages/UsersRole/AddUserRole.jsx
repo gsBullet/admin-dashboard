@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
@@ -8,13 +8,15 @@ import { EnvelopeIcon, UserCircleIcon } from "../../icons";
 import Button from "../../components/ui/button/Button";
 import { addUserRole } from "../../service/userRole";
 import SweetAlert from "../../components/common/SweetAlert";
+import { AuthContext } from "../../context/AuthContext";
 
 const AddUserRole = () => {
+  const { auth } = useContext(AuthContext);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("userRole", e.target.userRole.value);
-    const data = await addUserRole(formData);
+    const data = await addUserRole(formData, auth.token);
     if (data?.success) {
       SweetAlert({
         icon: "success",

@@ -1,7 +1,5 @@
 import { ReactNode } from "react";
 
-
-
 const Button = ({
   children,
   size = "md",
@@ -28,6 +26,8 @@ const Button = ({
       "bg-error-500 text-white shadow-theme-xs hover:bg-error-600 disabled:bg-error-300",
     warning:
       "bg-warning-500 text-white shadow-theme-xs hover:bg-warning-600 disabled:bg-warning-300",
+    success:
+      "bg-success-500 text-white shadow-theme-xs hover:bg-success-600 disabled:bg-success-300",
   };
 
   return (

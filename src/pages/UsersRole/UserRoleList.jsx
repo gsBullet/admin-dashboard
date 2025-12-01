@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
@@ -23,8 +23,10 @@ import SweetAlert from "../../components/common/SweetAlert";
 import Label from "../../components/form/Label";
 import Input from "../../components/form/input/InputField";
 import { UserCircleIcon } from "../../icons";
+import { AuthContext } from "../../context/AuthContext";
 
 const UserRoleList = () => {
+  const { auth } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [userRoles, setUserRoles] = useState([]);
   const [selectRole, setSelectRole] = useState(null);
@@ -33,7 +35,7 @@ const UserRoleList = () => {
   const fetchUserRoles = async () => {
     setLoading(true);
     try {
-      const response = await getAllUserRoles();
+      const response = await getAllUserRoles(auth.token);
 
       if (response.success) {
         setUserRoles(response.data);
@@ -61,7 +63,7 @@ const UserRoleList = () => {
     const formData = new FormData();
     formData.append("userRole", selectRole.userRole);
     // Call update API here with formData and selectRole._id
-    const data = await updateUserRole(selectRole._id, formData);
+    const data = await updateUserRole(selectRole._id, formData, auth.token);
     if (data?.success) {
       SweetAlert({
         icon: "success",
@@ -69,7 +71,7 @@ const UserRoleList = () => {
       });
       setIsOpen(false);
       setLoading(false);
-      const response = await getAllUserRoles();
+      const response = await getAllUserRoles(auth.token);
       setUserRoles(response.data);
     } else {
       SweetAlert({
@@ -88,6 +90,7 @@ const UserRoleList = () => {
       const data = await updateUserRoleStatus({
         id: role._id,
         status: !role.status,
+        token: auth.token,
       });
 
       if (data?.success) {
@@ -117,13 +120,13 @@ const UserRoleList = () => {
   const handleDelete = async (id) => {
     // Call delete API here with id
     try {
-      const data = await deleteUserRole(id);
+      const data = await deleteUserRole({ id, token: auth.token });
       if (data?.success) {
         SweetAlert({
           icon: "success",
           title: data.message,
         });
-        const response = await getAllUserRoles();
+        const response = await getAllUserRoles(auth.token);
         setUserRoles(response.data);
       } else {
         SweetAlert({

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
@@ -15,8 +15,10 @@ import { getAllUserRoles } from "../../service/userRole";
 import Button from "../../components/ui/button/Button";
 import { addUser } from "../../service/user";
 import SweetAlert from "../../components/common/SweetAlert";
+import { AuthContext } from "../../context/AuthContext";
 
 const AddUsers = () => {
+  const { auth } = useContext(AuthContext);
   const [userRole, setUserRole] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ const AddUsers = () => {
 
   useEffect(() => {
     const fetchUserRoles = async () => {
-      const roles = await getAllUserRoles();
+      const roles = await getAllUserRoles(auth.token);
       if (roles.success) {
         const roleOptions = roles?.data?.map((role) => ({
           value: role._id,
@@ -49,8 +51,8 @@ const AddUsers = () => {
     formData.append("password", e.target.password.value);
 
     try {
-      const response = await addUser(formData);
-      console.log(response);
+      const response = await addUser(formData, auth.token);
+      // console.log(response);
 
       if (response.success) {
         SweetAlert({
@@ -168,8 +170,8 @@ const AddUsers = () => {
               <option value="">Select a role</option>
               {userRole?.map((role) => (
                 <option
-                  key={role.value._id}
-                  value={role.value._id}
+                  key={role.value}
+                  value={role.value}
                   className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
                 >
                   {role.label}
@@ -204,7 +206,7 @@ const AddUsers = () => {
             </div>
           </div>
 
-          <div>
+          <div className="mt-10">
             <Button disabled={loading} type="submit" className="w-full">
               Add User
             </Button>
