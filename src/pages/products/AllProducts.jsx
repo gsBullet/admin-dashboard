@@ -109,7 +109,6 @@ const AllProducts = () => {
   }, [currentPage, limit, searchTerm, available, sort, order, searchCategory]);
 
   const changeStatus = async ({ product, checked }) => {
-
     const response = await updateProductStatus({
       id: product._id,
       status: checked,
@@ -263,6 +262,14 @@ const AllProducts = () => {
     }
   };
 
+  const limitWords = (text, limit = 10) => {
+    if (!text) return "";
+    const words = text.split(" ");
+    return words.length > limit
+      ? words.slice(0, limit).join(" ") + "..."
+      : text;
+  };
+
   return (
     <>
       <PageMeta title="All Products" description="All products" />
@@ -413,7 +420,7 @@ const AllProducts = () => {
                         </TableCell>
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
                           <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                            {product.description}
+                            {limitWords(product.description, 10)}
                           </span>
                         </TableCell>
 
@@ -557,18 +564,18 @@ const AllProducts = () => {
       <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        className="max-w-[700px] m-4"
+        className="max-w-[700px] h-screen"
       >
         <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-          <div className="px-2 pr-14">
+          <div className=" pr-14">
             <div className="flex justify-center items-center gap-10">
               <div className="relative-images">
                 <div className="flex flex-col gap-5">
                   {selectedProduct?.related_images.map((image, index) => (
                     <img
                       key={index}
-                      width={300}
-                      height={300}
+                      width={100}
+                      height={100}
                       src={import.meta.env.VITE_IMAGE_URL + image}
                       alt={selectedProduct?.name}
                       className="related-image"
@@ -579,7 +586,7 @@ const AllProducts = () => {
               <div className="thumbnail">
                 <img
                   width={300}
-                  height={600}
+                  height={300}
                   src={
                     import.meta.env.VITE_IMAGE_URL + selectedProduct?.thumbnail
                   }
@@ -631,9 +638,9 @@ const AllProducts = () => {
           </div>
           <div className="product-description">
             <Label>Description</Label>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <pre className="text-sm text-gray-500 dark:text-gray-400">
               {selectedProduct?.description}
-            </p>
+            </pre>
           </div>
           <div className="product-create-update flex flex-row gap-10 mt-6">
             <div className="createAt">

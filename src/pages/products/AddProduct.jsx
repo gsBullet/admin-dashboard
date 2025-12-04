@@ -24,7 +24,7 @@ const AddProduct = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetchAllCategoryForProduct(auth.token);
+      const res = await fetchAllCategoryForProduct({ token: auth.token });
       setCategories(res || []);
     } catch (err) {
       console.error(err);
@@ -134,6 +134,7 @@ const AddProduct = () => {
         timeout: 30000,
         headers: {
           "Content-Type": "multipart/form-data",
+          authorization: `EcomToken ${auth.token}`,
         },
       });
       console.log(response);
@@ -157,16 +158,14 @@ const AddProduct = () => {
       } else {
         SweetAlert({
           icon: "error",
-          title: "Error",
-          text: response?.data?.message || "Failed to add product",
+          title: response?.data?.message,
         });
       }
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.log("Error adding product:", error);
       SweetAlert({
         icon: "error",
-        title: "Error",
-        text: error.response?.data?.message || "Failed to add product",
+        title: error.response?.data?.message,
       });
     } finally {
       setLoading(false);
