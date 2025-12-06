@@ -22,7 +22,6 @@ export const checkUserAuth = async (token) => {
         Authorization: `EcomToken ${token}`,
       },
     });
-    console.log(response);
 
     if (response.data) {
       return response.data;

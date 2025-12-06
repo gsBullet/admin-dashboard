@@ -11,9 +11,6 @@ const AuthContextProvider = ({ children }) => {
     token: "",
   });
 
-  console.log("auth", auth);
-
-  console.log("userInfo", userInfo);
 
   const checkUser = async () => {
     const token = await JSON.parse(localStorage.getItem("ecom"));
