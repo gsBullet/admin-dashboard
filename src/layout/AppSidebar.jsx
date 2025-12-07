@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useLocation, } from "react-router";
+import { Link, useLocation } from "react-router";
 
 // Assume these icons are imported from an icon library
 import {
@@ -18,7 +18,6 @@ import {
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 
-
 const navItems = [
   {
     icon: <GridIcon />,
@@ -27,7 +26,7 @@ const navItems = [
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
-    icon: <CalenderIcon />,
+    icon: <i class="fas fa-snowflake text-lg"></i>,
     name: "Category",
     subItems: [
       { name: "Add Category", path: "/add-category", pro: false },
@@ -35,8 +34,8 @@ const navItems = [
     ],
   },
   {
-    icon: <CalenderIcon />,
-    name: "product",
+    icon: <i class="fa fa-list text-lg" aria-hidden="true"></i>,
+    name: "Product",
     subItems: [
       { name: "Add Product", path: "/add-product", pro: false },
       { name: "List of Product", path: "/all-products", pro: false },
@@ -76,6 +75,14 @@ const navItems = [
       { name: "404 Error", path: "/error-404", pro: false },
     ],
   },
+  {
+    name: "Banners",
+    icon: <i className="fas fa-chess-queen text-lg"></i>,
+    subItems: [
+      { name: "add Banner", path: "/add-hero-banner", pro: false },
+      { name: "Banner List", path: "/hero-banner-list", pro: false },
+    ],
+  },
 ];
 
 const othersItems = [
@@ -110,16 +117,12 @@ const othersItems = [
 ];
 
 const AppSidebar = () => {
- 
-
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [subMenuHeight, setSubMenuHeight] = useState({});
   const subMenuRefs = useRef({});
-
-
 
   // const isActive = (path: string) => location.pathname === path;
   const isActive = useCallback(
