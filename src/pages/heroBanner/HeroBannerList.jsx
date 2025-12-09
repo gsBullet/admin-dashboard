@@ -41,36 +41,14 @@ const HeroBannerList = () => {
   const [categoryName, setCategoryName] = useState("");
 
   // ---------- FETCH ----------
-  const fetchCategories = async (page = 1, size = limit) => {
+  const fetchHeroBanner = async () => {
     setLoading(true);
-    try {
-      const res = await Axios.get(
-        `/category/all-category?page=${page}&limit=${size}`,
-        {
-          headers: {
-            authorization: `EcomToken ${auth.token}`,
-          },
-        }
-      );
-
-      // Most backends return one of these two shapes
-      const payload = res.data?.data || res.data?.categories || res.data;
-
-      setCategories(payload || []);
-      setCurrentPage(Number(res.data.currentPage) || page);
-      setTotalPages(Number(res.data.totalPages) || 1);
-      setTotalItems(Number(res.data.totalItems) || payload?.length || 0);
-    } catch (err) {
-      console.error(err);
-      SweetAlert({ icon: "error", title: "Failed to load categories" });
-    } finally {
-      setLoading(false);
-    }
+    
   };
 
   useEffect(() => {
-    fetchCategories(currentPage, limit);
-  }, [currentPage, limit]);
+    fetchHeroBanner();
+  }, []);
 
   // ---------- EDIT ----------
   const handleEdit = (cat) => {

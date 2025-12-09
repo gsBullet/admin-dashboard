@@ -5,10 +5,13 @@ export const addHeroBanner = async (data) => {
     const response = await Axios.post(
       "/hero/create-hero-banner",
       {
-        name: data.get("name"),
+        title: data.get("title"),
+        desc: data.get("desc"),
+        heroImg: data.get("heroImg"),
       },
       {
         headers: {
+          "Content-Type": "multipart/form-data",
           authorization: `EcomToken ${data.get("token")}`,
         },
       }
@@ -20,7 +23,7 @@ export const addHeroBanner = async (data) => {
   }
 };
 
-export const getAllHeroBanner = async ({ page, limit,token }) => {
+export const getAllHeroBanner = async ({ page, limit, token }) => {
   try {
     const response = await Axios.get(
       `/hero-banner/all-hero-banner?page=${page}&limit=${limit}`,

@@ -29,7 +29,7 @@ import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import HomeLayout from "./layout/homeLayout/HomeLayout";
 import HeroBanner from "./pages/heroBanner/HeroBanner";
-import HeroBannerList from "./pages/heroBanner/ListCategory";
+import HeroBannerList from "./pages/heroBanner/HeroBannerList";
 
 export default function App() {
   const { auth } = useContext(AuthContext);
