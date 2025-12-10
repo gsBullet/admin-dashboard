@@ -1,13 +1,13 @@
 import Axios from "./Axios";
 
-export const addHeroBanner = async (data) => {
+export const addAvatarBanner = async (data) => {
   try {
     const response = await Axios.post(
-      "/hero/create-hero-banner",
+      "/avatar/create-avatar",
       {
         title: data.get("title"),
         desc: data.get("desc"),
-        heroImg: data.get("heroImg"),
+        avatar: data.get("avatar"),
       },
       {
         headers: {
@@ -23,10 +23,10 @@ export const addHeroBanner = async (data) => {
   }
 };
 
-export const getAllHeroBanner = async ({ page, limit, token }) => {
+export const getAllAvatarBanner = async ({ page, limit, token }) => {
   try {
     const response = await Axios.get(
-      `/hero-banner/all-hero-banner?page=${page}&limit=${limit}`,
+      `/avatar/get-all-avatars?page=${page}&limit=${limit}`,
       {
         headers: {
           authorization: `EcomToken ${token}`,
@@ -43,17 +43,21 @@ export const getAllHeroBanner = async ({ page, limit, token }) => {
   }
 };
 
-export const updateHeroBanner = async ({ formData, id, token }) => {
+export const updateAvatarBanner = async ({ formData, id, token }) => {
   try {
     const response = await Axios.post(
-      `/hero/update-hero-banner/${id}`,
+      `/avatar/update-avatar/${id}`,
+
       {
-        headers: {
-          authorization: `EcomToken ${token}`,
-        },
+        title: formData.get("title"),
+        desc: formData.get("desc"),
+        avatar: formData.get("avatar"),
       },
       {
-        name: formData.get("name"),
+        headers: {
+          "Content-Type": "multipart/form-data",
+          authorization: `EcomToken ${token}`,
+        },
       }
     );
     return response.data;
@@ -61,11 +65,11 @@ export const updateHeroBanner = async ({ formData, id, token }) => {
     return error;
   }
 };
-export const updateHeroBannerStatus = async ({ data, id, token }) => {
+export const updateAvatarBannerStatus = async ({ status, id, token }) => {
   try {
     const response = await Axios.post(
-      `/hero-banner/update-hero-banner-status/${id}`,
-      data,
+      `/avatar-banner/update-avatar-banner-status/${id}`,
+      status,
       {
         headers: {
           authorization: `EcomToken ${token}`,
@@ -78,8 +82,8 @@ export const updateHeroBannerStatus = async ({ data, id, token }) => {
   }
 };
 
-export const deleteHeroBanner = async ({ id, token }) => {
-  const response = await Axios.get(`/hero/delete-hero-banner/${id}`, {
+export const deleteAvatarBanner = async ({ id, token }) => {
+  const response = await Axios.get(`/avatar/delete-avatar/${id}`, {
     headers: {
       authorization: `EcomToken ${token}`,
     },

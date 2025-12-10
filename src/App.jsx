@@ -28,8 +28,8 @@ import Buttons from "./pages/UiElements/Buttons";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import HomeLayout from "./layout/homeLayout/HomeLayout";
-import HeroBanner from "./pages/heroBanner/HeroBanner";
-import HeroBannerList from "./pages/heroBanner/HeroBannerList";
+import AddAvatarBanner from "./pages/AvatarBanner/AddAvatarBanner";
+import AvatarBannerList from "./pages/AvatarBanner/AvatarBannerList";
 
 export default function App() {
   const { auth } = useContext(AuthContext);
@@ -70,8 +70,8 @@ export default function App() {
               <Route path="/all-user-roles" element={<UserRoleList />} />
 
               {/* add hero banner  */}
-              <Route path="/add-hero-banner" element={<HeroBanner />} />
-              <Route path="/hero-banner-list" element={<HeroBannerList />} />
+              <Route path="/add-avatar-banner" element={<AddAvatarBanner/>} />
+              <Route path="/avatar-banner-list" element={<AvatarBannerList/>} />
 
               {/* Ui Elements */}
               {/* <Route path="/alerts" element={<Alerts />} />

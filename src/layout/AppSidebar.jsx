@@ -26,7 +26,7 @@ const navItems = [
     // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
   {
-    icon: <i class="fas fa-snowflake text-lg"></i>,
+    icon: <i className="fas fa-snowflake text-lg"></i>,
     name: "Category",
     subItems: [
       { name: "Add Category", path: "/add-category", pro: false },
@@ -34,7 +34,7 @@ const navItems = [
     ],
   },
   {
-    icon: <i class="fa fa-list text-lg" aria-hidden="true"></i>,
+    icon: <i className="fa fa-list text-lg" aria-hidden="true"></i>,
     name: "Product",
     subItems: [
       { name: "Add Product", path: "/add-product", pro: false },
@@ -76,11 +76,11 @@ const navItems = [
     ],
   },
   {
-    name: "Banners",
+    name: "Avabar Banner",
     icon: <i className="fas fa-chess-queen text-lg"></i>,
     subItems: [
-      { name: "add Banner", path: "/add-hero-banner", pro: false },
-      { name: "Banner List", path: "/hero-banner-list", pro: false },
+      { name: "add avatar banner", path: "/add-avatar-banner", pro: false },
+      { name: "avatar banner List", path: "/avatar-banner-list", pro: false },
     ],
   },
 ];

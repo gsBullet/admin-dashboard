@@ -6,11 +6,11 @@ import Button from "../../components/ui/button/Button";
 import Input from "../../components/form/input/InputField";
 import SweetAlert from "../../components/common/SweetAlert";
 import { AuthContext } from "../../context/AuthContext";
-import { addHeroBanner } from "../../service/heroBanner";
 import Label from "../../components/form/Label";
 import TextArea from "../../components/form/input/TextArea";
+import { addAvatarBanner } from "../../service/avatarBanner";
 
-const HeroBanner = () => {
+const AddAvatarBanner = () => {
   const { auth } = useContext(AuthContext);
   const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,9 +35,9 @@ const HeroBanner = () => {
     formData.append("token", auth.token);
     formData.append("title", e.target.title.value);
     formData.append("desc", e.target.desc.value);
-    formData.append("heroImg", e.target.heroImg.files[0]);
+    formData.append("avatar", e.target.avatar.files[0]);
 
-    const data = await addHeroBanner(formData);
+    const data = await addAvatarBanner(formData);
 
     setIsSubmitting(false);
 
@@ -59,12 +59,12 @@ const HeroBanner = () => {
   return (
     <div className="min-h-screen  py-8 px-4">
       <PageMeta
-        title="Add Hero Banner"
-        description="Create stunning hero banners for your ecommerce platform"
+        title="Add Avatar Banner"
+        description="Create stunning avatar banners for your ecommerce platform"
       />
 
       <div className="max-w-4xl mx-auto">
-        <PageBreadcrumb pageTitle="Add Hero Banner" />
+        <PageBreadcrumb pageTitle="Add avatar Banner" />
 
         <div className="mt-8  rounded-2xl shadow-xl overflow-hidden border">
           {/* Header Section */}
@@ -86,7 +86,7 @@ const HeroBanner = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-3xl font-bold mb-2">Create Hero Banner</h1>
+                <h1 className="text-3xl font-bold mb-2">Create avatar Banner</h1>
                 <p className="text-indigo-100 text-sm">
                   Design eye-catching banners that convert visitors into
                   customers
@@ -116,7 +116,7 @@ const HeroBanner = () => {
                     d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
                   />
                 </svg>
-                Banner Title
+                Avatar Title
               </Label>
               <Input
                 type="text"
@@ -163,7 +163,7 @@ const HeroBanner = () => {
             {/* Image Upload with Preview */}
             <div className="group">
               <Label
-                htmlFor="heroImg"
+                htmlFor="avatarImg"
                 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2"
               >
                 <svg
@@ -179,14 +179,14 @@ const HeroBanner = () => {
                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                Hero Image
+                avatar Image
               </Label>
 
               <div className="relative">
                 <input
                   type="file"
-                  name="heroImg"
-                  id="heroImg"
+                  name="avatar"
+                  id="avatar"
                   accept="image/*"
                   onChange={handleImageChange}
                   className="hidden"
@@ -194,7 +194,7 @@ const HeroBanner = () => {
                 />
 
                 <label
-                  htmlFor="heroImg"
+                  htmlFor="avatar"
                   className="flex flex-col items-center justify-center w-full h-64 border-3 border-dashed border-slate-300 rounded-xl cursor-pointer bg-slate-50 hover:bg-indigo-50 hover:border-indigo-400 transition-all duration-300 overflow-hidden group"
                 >
                   {imagePreview ? (
@@ -283,7 +283,7 @@ const HeroBanner = () => {
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    Create Hero Banner
+                    Create avatar Banner
                   </>
                 )}
               </Button>
@@ -344,4 +344,4 @@ const HeroBanner = () => {
   );
 };
 
-export default HeroBanner;
+export default AddAvatarBanner;
