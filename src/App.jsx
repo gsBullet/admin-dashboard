@@ -30,6 +30,15 @@ import { AuthContext } from "./context/AuthContext";
 import HomeLayout from "./layout/homeLayout/HomeLayout";
 import AddAvatarBanner from "./pages/AvatarBanner/AddAvatarBanner";
 import AvatarBannerList from "./pages/AvatarBanner/AvatarBannerList";
+import PendingOrders from "./pages/Orders/PendingOrders";
+import CancelledOrders from "./pages/Orders/CancelledOrders";
+import DeleveredOrders from "./pages/Orders/DeleveredOrders";
+import ReturnOrders from "./pages/Orders/ReturnOrders";
+import CompleteOrders from "./pages/Orders/CompleteOrders";
+import BlockUser from "./pages/customerUsers/BlockUser";
+import VerifyUsers from "./pages/customerUsers/VerifyUsers";
+import StarUsers from "./pages/customerUsers/StarUsers";
+import GeneralUsers from "./pages/customerUsers/GeneralUsers";
 
 export default function App() {
   const { auth } = useContext(AuthContext);
@@ -70,8 +79,34 @@ export default function App() {
               <Route path="/all-user-roles" element={<UserRoleList />} />
 
               {/* add hero banner  */}
-              <Route path="/add-avatar-banner" element={<AddAvatarBanner/>} />
-              <Route path="/avatar-banner-list" element={<AvatarBannerList/>} />
+              <Route path="/add-avatar-banner" element={<AddAvatarBanner />} />
+              <Route
+                path="/avatar-banner-list"
+                element={<AvatarBannerList />}
+              />
+
+              {/* customer ORDERS routes */}
+              <Route path="/pending-order-list" element={<PendingOrders />} />
+              <Route
+                path="/completed-order-list"
+                element={<CompleteOrders />}
+              />
+              <Route
+                path="/cancelled-order-list"
+                element={<CancelledOrders />}
+              />
+              <Route
+                path="/delivered-order-list"
+                element={<DeleveredOrders />}
+              />
+              <Route path="/returned-order-list" element={<ReturnOrders />} />
+
+
+              {/* customers USERS routes  */}
+              <Route path="/block-users" element={<BlockUser />} /> 
+              <Route path="/verify-users" element={<VerifyUsers />} />
+              <Route path="/star-users" element={<StarUsers />} />
+              <Route path="/generale-users" element={<GeneralUsers />} />
 
               {/* Ui Elements */}
               {/* <Route path="/alerts" element={<Alerts />} />

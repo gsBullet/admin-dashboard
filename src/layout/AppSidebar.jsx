@@ -23,22 +23,22 @@ const navItems = [
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/",
-    // subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    // subItems: [{ name: "Ecommerce", path: "/",  }],
   },
   {
     icon: <i className="fas fa-snowflake text-lg"></i>,
     name: "Category",
     subItems: [
-      { name: "Add Category", path: "/add-category", pro: false },
-      { name: "List of Category", path: "/all-category", pro: false },
+      { name: "Add Category", path: "/add-category",  },
+      { name: "List of Category", path: "/all-category",  },
     ],
   },
   {
     icon: <i className="fa fa-list text-lg" aria-hidden="true"></i>,
     name: "Product",
     subItems: [
-      { name: "Add Product", path: "/add-product", pro: false },
-      { name: "List of Product", path: "/all-products", pro: false },
+      { name: "Add Product", path: "/add-product",  },
+      { name: "List of Product", path: "/all-products",  },
     ],
   },
   {
@@ -50,68 +50,90 @@ const navItems = [
     name: "Users",
     icon: <UsersIcon />,
     subItems: [
-      { name: "Add User", path: "/add-user", pro: false },
-      { name: "List of Users", path: "/all-users", pro: false },
+      { name: "Add User", path: "/add-user",  },
+      { name: "List of Users", path: "/all-users",  },
     ],
   },
   {
     name: "Role Management",
     icon: <UsersIcon />,
     subItems: [
-      { name: "Add User Role", path: "/add-user-role", pro: false },
-      { name: "List of User Roles", path: "/all-user-roles", pro: false },
+      { name: "Add User Role", path: "/add-user-role",  },
+      { name: "List of User Roles", path: "/all-user-roles",  },
     ],
   },
   {
     name: "Tables",
     icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+    subItems: [{ name: "Basic Tables", path: "/basic-tables",  }],
   },
   {
     name: "Pages",
     icon: <PageIcon />,
     subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
+      { name: "Blank Page", path: "/blank",  },
+      { name: "404 Error", path: "/error-404",  },
     ],
   },
   {
     name: "Avabar Banner",
     icon: <i className="fas fa-chess-queen text-lg"></i>,
     subItems: [
-      { name: "add avatar banner", path: "/add-avatar-banner", pro: false },
-      { name: "avatar banner List", path: "/avatar-banner-list", pro: false },
+      { name: "add avatar banner", path: "/add-avatar-banner",  },
+      { name: "avatar banner List", path: "/avatar-banner-list",  },
     ],
   },
 ];
 
 const othersItems = [
   {
+    icon: <i className="fa fa-user-secret text-lg" aria-hidden="true"></i>,
+    name: "Customer Users",
+    subItems: [
+      { name: "Verify User", path: "/verify-users",  },
+      { name: "Generale User", path: "/generale-users",  },
+      { name: "Star User", path: "/star-users",  },
+      { name: "Block User", path: "/block-users",  },
+      
+    ],
+  },
+  {
+    icon: <i class="fa fa-cart-plus text-lg" aria-hidden="true"></i>,
+    name: "Orders",
+    subItems: [
+      { name: "Pending Orders", path: "/pending-order-list",  },
+      { name: "Completed Orders", path: "/completed-order-list",  },
+      { name: "Cancelled Orders", path: "/cancelled-order-list",  },
+      { name: "Delivered Orders", path: "/delivered-order-list",  },
+      { name: "Returned Orders", path: "/returned-order-list",  },
+    ],
+  },
+  {
     icon: <PieChartIcon />,
     name: "Charts",
     subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
+      { name: "Line Chart", path: "/line-chart",  },
+      { name: "Bar Chart", path: "/bar-chart",  },
     ],
   },
   {
     icon: <BoxCubeIcon />,
     name: "UI Elements",
     subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
+      { name: "Alerts", path: "/alerts",  },
+      { name: "Avatar", path: "/avatars",  },
+      { name: "Badge", path: "/badge",  },
+      { name: "Buttons", path: "/buttons",  },
+      { name: "Images", path: "/images",  },
+      { name: "Videos", path: "/videos",  },
     ],
   },
   {
     icon: <PlugInIcon />,
     name: "Authentication",
     subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
+      { name: "Sign In", path: "/signin",  },
+      { name: "Sign Up", path: "/signup",  },
     ],
   },
 ];
