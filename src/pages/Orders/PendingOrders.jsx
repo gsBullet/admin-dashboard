@@ -13,11 +13,23 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import Switch from "../../components/form/switch/Switch";
+import Badge from "../../components/ui/badge/Badge";
+import bdTimeFormat from "../../components/common/bdTimeFormat";
+
+import ShowOrderModal from "../../components/orderModal/ShowOrderModal";
+import EditPendingOrder from "./EditPendingOrder";
 
 const PendingOrders = () => {
   const { auth } = useContext(AuthContext);
   const [penOrders, setPenOrders] = useState([]);
   const [showNoData, setShowNoData] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isPendingOpen, setIsPendingOpen] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
   // console.log(auth);
 
   useEffect(() => {
@@ -37,6 +49,21 @@ const PendingOrders = () => {
 
     fetchPendingOrders();
   }, [auth.checkAuth]);
+
+  const handleShowOrder = (order) => {
+    setIsPendingOpen(true);
+    setOrderDetails(order);
+  };
+  const handleEditOrder = (order) => {
+    // Implement the logic to confirm the order
+    console.log("Confirm order:", order);
+    setIsEditOpen(true);
+    setOrderDetails(order);
+  };
+  const handleConfirmOrder = (orderId) => {
+    // Implement the logic to delete the order
+    console.log("Delete order with ID:", orderId);
+  };
 
   return (
     <div>
@@ -135,7 +162,7 @@ const PendingOrders = () => {
                       >
                         Total Amount
                       </TableCell>
-                     
+
                       <TableCell
                         isHeader
                         className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
@@ -183,11 +210,10 @@ const PendingOrders = () => {
                             {order.phone}
                           </span>
                         </TableCell>
-                       
 
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
                           <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                            ${order.quantity}
+                            {order.quantity}
                           </span>
                         </TableCell>
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
@@ -196,78 +222,71 @@ const PendingOrders = () => {
                           </span>
                         </TableCell>
                         <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
-                          {order.totalAmount}
+                          ${order.totalAmount}
                         </TableCell>
 
                         <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
                           {order.address}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
-                        {order.createdAt.slice(0,10)+" "+order.createdAt.slice(11,19)}
+                          {bdTimeFormat(order.createdAt)}
                         </TableCell>
-                        {/* switch cell  */}
+                        {/* badge cell  */}
                         <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
-                          <Switch
+                          <Badge
                             size="sm"
                             color={
-                              order.status === "pending"
-                                ? "blue"
-                                : order.status === "cancelled"
-                                ? "warning"
-                                : "error"
+                              order.status === "pending" ? "warning" : "error"
                             }
-                            defaultChecked={order.status === "pending"}
-                            label={order.status === "pending" ? "Pending" : "Cancelled"}
-                            // onChange={(checked) =>
-                            //   changeStatus({ order, checked })
-                            // }
-                          />
+                          >
+                            {order.status}
+                          </Badge>
                         </TableCell>
                         {/* action cells */}
-                        {/* <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                        <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                           <div className="flex gap-3">
                             <button
-                              onClick={() => handleShowProduct(product)}
-                              className="text-green-600  hover:bg-green-600  dark:text-green-400 px-1 py-1"
+                              onClick={() => handleShowOrder(order)}
+                              className="text-green-600  hover:bg-green-600 rounded dark:text-green-400 px-1 py-1"
                             >
                               <i
-                                className="fa fa-eye text-xl hover:text-white"
+                                className="fa fa-book-open  text-xl hover:text-white"
                                 aria-hidden="true"
-                                title="view"
+                                title="view order"
                               ></i>
                             </button>
                             <button
-                              onClick={() => handleEditProduct(product)}
-                              disabled={product.status === false}
+                              onClick={() => handleEditOrder(order)}
+                              disabled={order.status === false}
                               className={`text-blue-600   dark:text-blue-400 px-1 py-1${
-                                product.status === false
+                                order.status === false
                                   ? " cursor-not-allowed opacity-30 "
-                                  : " hover:text-white hover:bg-blue-600"
+                                  : " hover:text-white hover:bg-blue-600 rounded"
                               }`}
                             >
                               <i
                                 className="fa fa-edit text-xl "
                                 aria-hidden="true"
-                                title="edit"
+                                title="edit order"
                               ></i>
                             </button>
                             <button
-                              disabled={product.status === true}
-                              onClick={() => handleDeleteProduct(product._id)}
-                              className={`text-red-600   px-1 py-1 ${
-                                product.status === true
+                              disabled={order.status === true}
+                              onClick={() => handleConfirmOrder(order._id)}
+                              className={`text-orange-600   px-1 py-1 ${
+                                order.status === true
                                   ? " cursor-not-allowed opacity-30 "
-                                  : " hover:text-white hover:bg-red-600 "
+                                  : " hover:text-white hover:bg-orange-600 rounded"
                               }`}
                             >
                               <i
-                                className="fa fa-trash text-xl"
+                                class="fas fa-bolt text-xl px-1"
                                 aria-hidden="true"
-                                title="delete"
+                                title="confirm order"
                               ></i>
                             </button>
                           </div>
-                        </TableCell> */}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -287,6 +306,18 @@ const PendingOrders = () => {
           </div>
         </ComponentCard>
       </div>
+
+      {/* show order modal */}
+      <ShowOrderModal
+        isEditOpen={isPendingOpen}
+        setIsEditOpen={setIsPendingOpen}
+        orderInfo={orderDetails}
+      />
+      <EditPendingOrder
+        isEditOpen={isEditOpen}
+        setIsEditOpen={setIsEditOpen}
+        orderInfo={orderDetails}
+      />
     </div>
   );
 };
