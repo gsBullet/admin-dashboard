@@ -18,12 +18,12 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
   const customerInfo = customerId?.addresses?.[0] || {};
   const products = orderInfo?.customerProducts || [];
 
-  console.log(orderInfo);
-
   /* ---------------- STATE ---------------- */
   const [customer, setCustomer] = useState(customerInfo);
   const [items, setItems] = useState(products);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  console.log(customer);
 
   /* ---------------- INIT ---------------- */
   useEffect(() => {
@@ -42,10 +42,10 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
     setItems(updated);
   };
 
-  const handleReset = () => {
-    setCustomer(customerInfo);
-    setItems(products);
-  };
+  // const handleReset = () => {
+  //   setCustomer(customerInfo);
+  //   setItems(products);
+  // };
 
   /* ---------------- CALC ---------------- */
   const quantity = useMemo(
@@ -67,9 +67,9 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
       orderId: orderInfo?._id,
       customer,
       products: items,
-      summary: { quantity, totalAmount },
     };
-
+    payload.products.quantity = quantity;
+    payload.products.totalAmount = totalAmount;
     try {
       console.log("SUBMIT DATA 👉", payload);
       // await axios.put(`/orders/${orderInfo._id}`, payload);
@@ -102,6 +102,15 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
               <p className="text-gray-800 dark:text-white/90 text-center ">
                 Order Date: {bdTimeFormat(createdAt)}
               </p>
+              <div className="px-4 py-3 text-center">
+                <span className="dark:text-white/90">Order Status:&nbsp;</span>
+                <Badge
+                  size="sm"
+                  color={status === "pending" ? "warning" : "error"}
+                >
+                  {status}
+                </Badge>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8 ">
@@ -117,7 +126,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     </label>
                     <Input
                       type="text"
-                      value={customerInfo.fullName}
+                      value={customer.fullName}
                       onChange={(e) =>
                         handleCustomerInfoChange("fullName", e.target.value)
                       }
@@ -129,7 +138,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     </label>
                     <Input
                       type="email"
-                      value={customerInfo.email}
+                      value={customer.email}
                       onChange={(e) =>
                         handleCustomerInfoChange("email", e.target.value)
                       }
@@ -141,7 +150,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     </label>
                     <Input
                       type="tel"
-                      value={customerInfo.phone}
+                      value={customer.phone}
                       onChange={(e) =>
                         handleCustomerInfoChange("phone", e.target.value)
                       }
@@ -153,7 +162,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     </label>
                     <Input
                       type="text"
-                      value={customerInfo.city}
+                      value={customer.city}
                       onChange={(e) =>
                         handleCustomerInfoChange("city", e.target.value)
                       }
@@ -165,7 +174,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     </label>
                     <Input
                       type="text"
-                      value={customerInfo.address}
+                      value={customer.address}
                       onChange={(e) =>
                         handleCustomerInfoChange("address", e.target.value)
                       }
@@ -177,7 +186,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     </label>
                     <Input
                       type="text"
-                      value={customerInfo.state}
+                      value={customer.state}
                       onChange={(e) =>
                         handleCustomerInfoChange("state", e.target.value)
                       }
@@ -188,8 +197,8 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                       Post Code
                     </label>
                     <Input
-                      type="text"
-                      value={customerInfo.postalCode}
+                      type="number"
+                      value={customer.postalCode}
                       onChange={(e) =>
                         handleCustomerInfoChange("postalCode", e.target.value)
                       }
@@ -200,7 +209,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                       Delivery Method
                     </label>
                     <Select
-                      defaultValue={customerInfo.deliveryMethod}
+                      defaultValue={customer.deliveryMethod}
                       onChange={(val) =>
                         handleCustomerInfoChange("deliveryMethod", val)
                       }
@@ -215,7 +224,14 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
                       Payment Method
                     </label>
-                    <Input type="text" value={paymentMethod} disabled />
+                    <Input
+                      type="text"
+                      value={paymentMethod}
+                      onChange={(val) =>
+                        handleCustomerInfoChange("paymentMethod", val)
+                      }
+                      disabled
+                    />
                   </div>
                 </div>
               </div>
@@ -244,9 +260,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                         <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                           Available
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
-                          Status
-                        </th>
+
                         <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                           Price
                         </th>
@@ -296,14 +310,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                                 : "Out of Stock"}
                             </Badge>
                           </td>
-                          <td className="px-4 py-3">
-                            <Badge
-                              size="sm"
-                              color={status === "pending" ? "warning" : "error"}
-                            >
-                              {status}
-                            </Badge>
-                          </td>
+
                           <td className="px-4 py-3">
                             <div className="flex items-center">
                               <span className="mr-1">$</span>
@@ -318,6 +325,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                                     e.target.value
                                   )
                                 }
+                                disabled
                               />
                             </div>
                           </td>
@@ -424,13 +432,6 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
 
               {/* Action Buttons */}
               <div className="flex justify-end space-x-4 pt-4 border-t">
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="px-6 py-2 border border-gray-300 dark:border-gray-50 text-gray-700 dark:text-white/90 rounded-md hover:bg-gray-50 dark:hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                >
-                  Reset Changes
-                </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
