@@ -23,6 +23,10 @@ const ShowOrderModal = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
   } = orderInfo || {};
   const customerInfo = customerId?.addresses?.[0] || {};
   const products = orderInfo?.customerProducts || [];
+  const productTotalAmount = orderInfo?.customerProducts?.reduce(
+    (total, product) => total + product.price * product.quantity,
+    0
+  );
   console.log(customerInfo);
 
   return (
@@ -30,7 +34,7 @@ const ShowOrderModal = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
       <Modal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        className="max-w-[1200px] h-[80vh] overflow-y-auto m-4"
+        className="max-w-[1200px] h-[85vh] overflow-y-auto m-4"
       >
         <div className=" relative w-full  overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
           <div className="px-2">
@@ -49,14 +53,30 @@ const ShowOrderModal = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                 {customerInfo.email}
               </p>
               <p className="text-gray-800 dark:text-white/90">
-                <span className="font-semibold">Phone:</span>{" "}
-                {customerInfo.phone}
+                <span className="font-semibold">Customer Phone:</span>{" "}
+                <a
+                  className="hover:text-brand-700 hover:underline"
+                  href={`tel:${customerId?.phone}`}
+                >
+                  {customerId?.phone}
+                </a>
               </p>
+
+              <p className="text-gray-800 dark:text-white/90">
+                <span className="font-semibold">Billing Phone:</span>{" "}
+                <a
+                  className="hover:text-brand-700 hover:underline"
+                  href={`tel:${customerInfo.phone}`}
+                >
+                  {customerInfo.phone}
+                </a>
+              </p>
+
               <p className="text-gray-800 dark:text-white/90">
                 <span className="font-semibold">City:</span> {customerInfo.city}
               </p>
               <p className="text-gray-800 dark:text-white/90">
-                <span className="font-semibold">delivery</span>{" "}
+                <span className="font-semibold">Delivery:</span>{" "}
                 {customerInfo.deliveryMethod}
               </p>
 
@@ -75,165 +95,145 @@ const ShowOrderModal = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
             </div>
           </div>
 
-          <div className="mt-6">
-            <Table className={""}>
-              {/* Table Header */}
-              <TableHeader className="border-b border-gray-800 dark:border-white/90   ">
-                <TableRow className={"text-center"}>
-                  <TableCell
-                    isHeader
-                    className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
-                  >
-                    Product Id
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
-                  >
+          <div className="overflow-x-auto  mt-12">
+            <table className="min-w-full divide-y text-gray-800 dark:text-white/90">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
+                    Product ID
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                     Product Name
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
-                  >
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                     Category
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
-                  >
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                     Quantity
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
-                  >
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                     Available
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
-                  >
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                     Status
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
-                  >
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                     Price
-                  </TableCell>
-                </TableRow>
-              </TableHeader>
-
-              {/* Table Body */}
-
-              <TableBody className="divide-y divide-gray-100 dark:divide-white/50">
-                {products?.map((product) => (
-                  <TableRow key={product._id}>
-                    <TableCell className="px-5 py-4 sm:px-6 text-start">
-                      <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                        {product.id}
-                      </span>
-                    </TableCell>
-                    <TableCell className="px-5 py-4 sm:px-6 text-start">
-                      <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                        {product.productId.name}
-                      </span>
-                    </TableCell>
-                    <TableCell className="px-5 py-4 sm:px-6 text-start">
-                      <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                        {product.productId.category.name}
-                      </span>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
-                      {product.quantity}
-                    </TableCell>
-
-                    <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
-                      {product.productId.available ? "Yes" : "No"}
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
+                  </th>
+                </tr>
+              </thead>
+              <tbody className=" divide-y divide-gray-200">
+                {products.map((product) => (
+                  <tr
+                    key={product._id}
+                    // className="dark:hover:bg-gray-700 hover:bg-gray-50"
+                  >
+                    <td className="px-4 py-3 text-sm font-medium text-gray-800 dark:text-white/90">
+                      {product.id}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-white/90">
+                      {product?.productId?.name}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-white/90">
+                      {product?.productId?.category?.name}
+                    </td>
+                    <td className="px-4 py-3">{product.quantity}</td>
+                    <td className="px-4 py-3">
+                      <Badge
+                        size="sm"
+                        color={
+                          product?.productId?.available === true
+                            ? "success"
+                            : "error"
+                        }
+                      >
+                        {product?.productId?.available
+                          ? "In Stock"
+                          : "Out of Stock"}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3">
                       <Badge
                         size="sm"
                         color={status === "pending" ? "warning" : "error"}
                       >
                         {status}
                       </Badge>
-                    </TableCell>
-                    <TableCell className="px-5 py-4 sm:px-6 text-start">
-                      <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                        ${product.productId.new_price}
-                      </span>
-                    </TableCell>
-                  </TableRow>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center">
+                        <span className="mr-1">$</span>
+                        {product.price}
+                      </div>
+                    </td>
+                  </tr>
                 ))}
-              </TableBody>
-            </Table>
-            <Table className={"border-t"}>
-              <TableBody className="divide-y divide-gray-100 dark:divide-white/50">
-                <TableRow>
-                  <TableCell
-                    rowSpan={6}
-                    className="px-5 py-4 sm:px-6 text-start font-bold"
+              </tbody>
+              <tbody>
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="px-4 py-3 text-right font-semibold text-gray-800 dark:text-white/90"
                   >
-                    <span className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90">
-                      Total Products : {products.length}
-                    </span>
-                  </TableCell>
-                  <TableCell
-                    colSpan={6}
-                    className="px-5 py-4 sm:px-6 text-start font-bold"
+                    Subtotal:
+                  </td>
+                  <td className="px-4 py-3 font-semibold text-gray-800 dark:text-white/90">
+                    ${productTotalAmount}
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="px-4 py-3 text-right font-semibold text-gray-800 dark:text-white/90"
                   >
-                    <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      Payment made: ${paymentMethod}
-                    </span>
-                  </TableCell>
-                  <TableCell
-                    colSpan={6}
-                    className="px-5 py-4 sm:px-6 text-start font-bold"
+                    Delivery Charge:
+                  </td>
+                  <td className="px-4 py-3 font-semibold text-gray-800 dark:text-white/90">
+                    ${totalAmount - productTotalAmount}
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td
+                    colSpan="2"
+                    className="px-4 py-3 text-right font-semibold text-gray-800 dark:text-white/90"
                   >
-                    <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      TrxID: {trxId}
-                    </span>
-                  </TableCell>
-                  <TableCell
-                    colSpan={6}
-                    className="px-5 py-4 sm:px-6 text-start font-bold"
+                    {products.length} Items
+                  </td>
+                  <td
+                    colSpan="2"
+                    className="px-4 py-3 text-right font-semibold text-gray-800 dark:text-white/90"
                   >
-                    <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      Total Quantity : {quantity}
-                    </span>
-                  </TableCell>
-                  <TableCell
-                    colSpan={6}
-                    className="px-5 py-4 sm:px-6 text-start font-bold"
-                  >
-                    <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      Delivary Cost : {quantity}
-                    </span>
-                  </TableCell>
+                    {quantity} Quantity
+                  </td>
 
-                  <TableCell
-                    colSpan={6}
-                    className="px-5 py-4 sm:px-6 text-start font-bold"
+                  <td
+                    colSpan="2"
+                    className="px-4 py-3 text-right font-semibold text-gray-800 dark:text-white/90"
                   >
-                    <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                      Total Amount : ${totalAmount}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+                    Total Amount:
+                  </td>
+                  <td className="px-4 py-3 font-semibold text-gray-800 dark:text-white/90">
+                    <div className="flex items-center">
+                      <span className="mr-1">$</span>
+                      {totalAmount}
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>
         <div className="p-10">
           <p className="text-gray-800 dark:text-white/90 italic">
             Full Name: {customerInfo.fullName}, Email: {customerInfo.email},
-            Phone:
+            Customer Phone:
+            {customerId?.phone}, Billing Address Phone:
             {customerInfo.phone},Address: {customerInfo.address}, City:{" "}
             {customerInfo.city},State: {customerInfo.state},PostCode:{" "}
             {customerInfo.postalCode}, delivery: {customerInfo.deliveryMethod},
-            PaymentMethod: {paymentMethod}, Order Date:{" "}
+            PaymentMethod: {paymentMethod},TransactionID:{trxId}, Order Date:
             {bdTimeFormat(createdAt)},
           </p>
         </div>

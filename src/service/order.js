@@ -8,6 +8,21 @@ export const pendingOrdersByAdmin = async (token) => {
   });
   return response.data;
 };
+
+export const EditPendingOrdersByAdmin = async (token, orderId) => {
+  const response = await Axios.get(
+    "/orders/edit-pending-orders",
+    {
+      orderId: orderId,
+    },
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    }
+  );
+  return response.data;
+}
 export const completedOrdersByAdmin = async (token) => {
   const response = await Axios.get("/orders/completed-orders", {
     headers: {
