@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { pendingOrdersByAdmin } from "../../service/order";
+import {
+  cancelOrdersByAdmin,
+  completedOrdersByAdmin,
+  pendingOrdersByAdmin,
+} from "../../service/order";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
@@ -18,6 +22,7 @@ import bdTimeFormat from "../../components/common/bdTimeFormat";
 
 import ShowOrderModal from "../../components/orderModal/ShowOrderModal";
 import EditPendingOrder from "./EditPendingOrder";
+import SweetAlert from "../../components/common/SweetAlert";
 
 const PendingOrders = () => {
   const { auth } = useContext(AuthContext);
@@ -26,9 +31,9 @@ const PendingOrders = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPendingOpen, setIsPendingOpen] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState("");
+  // const [searchTerm, setSearchTerm] = useState("");
 
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   // console.log(auth);
 
@@ -60,9 +65,41 @@ const PendingOrders = () => {
     setIsEditOpen(true);
     setOrderDetails(order);
   };
-  const handleConfirmOrder = (orderId) => {
-    // Implement the logic to delete the order
-    console.log("Delete order with ID:", orderId);
+  const handleConfirmOrder = async (orderId) => {
+    const result = await SweetAlert({
+      type: "confirm",
+      title: "Order Action",
+      text: "Please select an action for this order",
+      icon: "question",
+      showDenyButton: true,
+      showCancelButton: false, // ❌ popup close cancel নাই
+      confirmButtonText: "Confirm Order",
+      denyButtonText: "Cancel Order",
+      confirmButtonColor: "#16a34a",
+      denyButtonColor: "#dc2626",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    if (result.isConfirmed) {
+      // ✅ CONFIRM ORDER
+      await completedOrdersByAdmin(orderId, auth.token,);
+      SweetAlert({
+        type: "toast",
+        icon: "success",
+        title: "Order Confirmed",
+      });
+    }
+
+    if (result.isDenied) {
+      // ❌ CANCEL ORDER
+      await cancelOrdersByAdmin(orderId, auth.token);
+      SweetAlert({
+        type: "toast",
+        icon: "success",
+        title: "Order Cancelled",
+      });
+    }
   };
 
   return (

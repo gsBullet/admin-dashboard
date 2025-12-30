@@ -9,30 +9,25 @@ export const pendingOrdersByAdmin = async (token) => {
   return response.data;
 };
 
-export const EditPendingOrdersByAdmin = async (token, orderId) => {
-  const response = await Axios.get(
-    "/orders/edit-pending-orders",
-    {
-      orderId: orderId,
-    },
-    {
-      headers: {
-        Authorization: `EcomToken ${token}`,
-      },
-    }
-  );
-  return response.data;
-}
-export const completedOrdersByAdmin = async (token) => {
-  const response = await Axios.get("/orders/completed-orders", {
+export const getCompletedOrdersByAdmin = async (token) => {
+  const response = await Axios.get("/orders/get-completed-orders", {
     headers: {
       Authorization: `EcomToken ${token}`,
     },
   });
   return response.data;
 };
-export const cancelOrdersByAdmin = async (token) => {
-  const response = await Axios.get("/orders/cancel-orders", {
+
+export const completedOrdersByAdmin = async (orderId, token) => {
+  const response = await Axios.get(`/orders/completed-orders/${orderId}`, {
+    headers: {
+      Authorization: `EcomToken ${token}`,
+    },
+  });
+  return response.data;
+};
+export const cancelOrdersByAdmin = async (orderId, token) => {
+  const response = await Axios.get(`/orders/cancelling-orders/${orderId}`, {
     headers: {
       Authorization: `EcomToken ${token}`,
     },
@@ -62,7 +57,7 @@ export const orderDetailsByAdmin = async (token, orderId) => {
   return response.data;
 };
 
-export const updateOrderStatusByAdmin = async ({token, orderId, status}) => {
+export const updateOrderStatusByAdmin = async ({ token, orderId, status }) => {
   const response = await Axios.post(
     `/orders/update-order-status/${orderId}`,
     {
