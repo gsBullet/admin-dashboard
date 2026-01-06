@@ -23,6 +23,7 @@ import bdTimeFormat from "../../components/common/bdTimeFormat";
 import ShowOrderModal from "../../components/orderModal/ShowOrderModal";
 import EditPendingOrder from "./EditPendingOrder";
 import SweetAlert from "../../components/common/SweetAlert";
+import Swal from "sweetalert2";
 
 const CompleteOrders = () => {
   const { auth } = useContext(AuthContext);
@@ -66,24 +67,29 @@ const CompleteOrders = () => {
     setOrderDetails(order);
   };
   const handleConfirmOrder = async (orderId) => {
-    const result = await SweetAlert({
-      type: "confirm",
-      title: "Order Action",
-      text: "Please select an action for this order",
+    const result = await Swal.fire({
+      title: "Make a Order Action",
       icon: "question",
+
+      showCloseButton: true, // ❌ close icon
+      closeButtonAriaLabel: "Close",
+
       showDenyButton: true,
-      showCancelButton: false, // ❌ popup close cancel নাই
+      showCancelButton: false,
+
       confirmButtonText: "Confirm Order",
       denyButtonText: "Cancel Order",
+
       confirmButtonColor: "#16a34a",
       denyButtonColor: "#dc2626",
+
       allowOutsideClick: false,
       allowEscapeKey: false,
     });
 
     if (result.isConfirmed) {
       // ✅ CONFIRM ORDER
-      await completedOrdersByAdmin(orderId, auth.token,);
+      await completedOrdersByAdmin(orderId, auth.token);
       SweetAlert({
         type: "toast",
         icon: "success",
@@ -273,7 +279,7 @@ const CompleteOrders = () => {
                           <Badge
                             size="sm"
                             color={
-                              order.status === "pending" ? "warning" : "error"
+                              order.status === "confirmed" ? "primary" : "error"
                             }
                           >
                             {order.status}

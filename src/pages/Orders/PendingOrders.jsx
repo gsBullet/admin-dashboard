@@ -4,6 +4,7 @@ import {
   cancelOrdersByAdmin,
   completedOrdersByAdmin,
   pendingOrdersByAdmin,
+  pendingOrdersByAdminByDate,
 } from "../../service/order";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
@@ -28,7 +29,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Button from "../../components/ui/button/Button";
 import "./css/order.css";
-import Swal from "sweetalert2"
+import Swal from "sweetalert2";
 
 const PendingOrders = () => {
   const { auth } = useContext(AuthContext);
@@ -48,6 +49,7 @@ const PendingOrders = () => {
 
   const [orderDetails, setOrderDetails] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [pendingOrderByDate, setPendingOrderByDate] = useState([]);
   console.log(dateByOrders);
 
   useEffect(() => {
@@ -65,6 +67,7 @@ const PendingOrders = () => {
 
         if (response.success) {
           setPenOrders(response.data.orders);
+          setPendingOrderByDate(response.data.orders);
           setTotalItems(response.data.totalItems);
           setTotalPages(response.data.totalPages);
           setCurrentPage(response.data.currentPage);
@@ -87,6 +90,29 @@ const PendingOrders = () => {
     paymentMethod,
     dateByOrders,
   ]);
+
+  useEffect(() => {
+    const fetchPendingOrders = async () => {
+      setShowNoData(false);
+      try {
+        const response = await pendingOrdersByAdminByDate(
+          auth.token
+        );
+
+        if (response.success) {
+          setPendingOrderByDate(response.data.orders);
+        }
+      } catch (error) {
+        console.error("Error fetching pending orders:", error);
+      } finally {
+        setShowNoData(true);
+      }
+    };
+
+    fetchPendingOrders();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.checkAuth,dateByOrders]);
 
   const handleShowOrder = (order) => {
     setIsPendingOpen(true);
@@ -127,7 +153,7 @@ const PendingOrders = () => {
         type: "toast",
         icon: "success",
         title: "Order Confirmed",
-      })
+      });
     }
 
     // ❌ DENY (Cancel Order)
@@ -137,16 +163,7 @@ const PendingOrders = () => {
         type: "toast",
         icon: "warning",
         title: "Order Cancelled",
-      })
-    }
-
-    // ❎ CLOSE (X clicked)
-    else if (result.dismiss === Swal.DismissReason.close) {
-      SweetAlert({
-        type: "toast",
-        icon: "error",
-        title: "Action Cancelled",
-      })
+      });
     }
   };
 
@@ -162,7 +179,7 @@ const PendingOrders = () => {
     setPaymentMethod("");
     setDateByOrders("");
   };
-  const pendingOrderDates = penOrders?.map(
+  const pendingOrderDates = pendingOrderByDate?.map(
     (date) => new Date(date.createdAt).toISOString().split("T")[0]
   );
 
@@ -175,8 +192,8 @@ const PendingOrders = () => {
       <PageBreadcrumb pageTitle="Pending Orders" />
       {showCalendar && (
         <DatePicker
-          selected={dateByOrders}
-          onChange={(date) => setDateByOrders(date)}
+          // selected={dateByOrders}
+          // onChange={(date) => setDateByOrders(date)}
           inline
           highlightDates={[
             {

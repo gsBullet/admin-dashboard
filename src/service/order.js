@@ -18,6 +18,19 @@ export const pendingOrdersByAdmin = async (
   );
   return response.data;
 };
+export const pendingOrdersByAdminByDate = async (
+  token,
+) => {
+  const response = await Axios.get(
+    `/orders/pending-orders-by-date`,
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
 
 export const getCompletedOrdersByAdmin = async (token) => {
   const response = await Axios.get("/orders/get-completed-orders", {
