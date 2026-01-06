@@ -1,11 +1,21 @@
 import Axios from "./Axios";
 
-export const pendingOrdersByAdmin = async (token) => {
-  const response = await Axios.get("/orders/pending-orders", {
-    headers: {
-      Authorization: `EcomToken ${token}`,
-    },
-  });
+export const pendingOrdersByAdmin = async (
+  token,
+  limit,
+  currentPage,
+  searchTerm,
+  paymentMethod,
+  dateByOrders
+) => {
+  const response = await Axios.get(
+    `/orders/pending-orders?limit=${limit}&currentPage=${currentPage}&searchTerm=${searchTerm}&paymentMethod=${paymentMethod}&dateByOrders=${dateByOrders}`,
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    }
+  );
   return response.data;
 };
 
