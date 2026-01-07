@@ -169,6 +169,7 @@ const CompleteOrders = () => {
   const pendingOrderDates = pendingOrderByDate?.map(
     (date) => new Date(date.updatedAt).toISOString().split("T")[0]
   );
+ 
 
   return (
     <div>
@@ -321,7 +322,7 @@ const CompleteOrders = () => {
                         isHeader
                         className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
-                        Status
+                        Order Status
                       </TableCell>
                       <TableCell
                         isHeader
@@ -416,6 +417,7 @@ const CompleteOrders = () => {
                                 title="confirm order"
                               ></i>
                             </button>
+                           
                           </div>
                         </TableCell>
                       </TableRow>

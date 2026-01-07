@@ -1,8 +1,8 @@
-
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import {
   cancelOrdersByAdmin,
+  deleteOrderByAdmin,
   deliveredOrdersByAdmin,
   deliveredOrdersByAdminByDate,
   deliveredOrdersFromCompleted,
@@ -77,7 +77,7 @@ const DeleveredOrders = () => {
     };
 
     fetchDeliveredOrders();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     auth.checkAuth,
     currentPage,
@@ -173,7 +173,34 @@ const DeleveredOrders = () => {
     (date) => new Date(date.updatedAt).toISOString().split("T")[0]
   );
 
-  console.log(deliveredOrderByDate);
+  const handleDeleteOrder = (orderId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const response = await deleteOrderByAdmin({
+          token: auth.token,
+          orderId,
+        });
+
+        if (response?.success) {
+          setPenOrders((prevOrders) =>
+            prevOrders.filter((order) => order._id !== orderId)
+          );
+          return Swal.fire({
+            title: "Your file has been deleted.",
+            icon: "success",
+          });
+        }
+      }
+    });
+  };
 
   return (
     <div>
@@ -417,6 +444,21 @@ const DeleveredOrders = () => {
                             >
                               <i
                                 class="fas fa-bolt text-xl px-1"
+                                aria-hidden="true"
+                                title="confirm order"
+                              ></i>
+                            </button>
+                            <button
+                              disabled={order.status === true}
+                              onClick={() => handleDeleteOrder(order._id)}
+                              className={`text-red-800   px-1 py-1 ${
+                                order.status === true
+                                  ? " cursor-not-allowed opacity-30 "
+                                  : " hover:text-white hover:bg-red-800 rounded"
+                              }`}
+                            >
+                              <i
+                                class="fas fa-trash text-xl px-1"
                                 aria-hidden="true"
                                 title="confirm order"
                               ></i>
