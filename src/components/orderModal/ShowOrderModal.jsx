@@ -10,7 +10,7 @@ import {
 import Badge from "../ui/badge/Badge";
 import bdTimeFormat from "../common/bdTimeFormat";
 
-const ShowOrderModal = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
+const ShowOrderModal = ({ isEditOpen, setIsEditOpen, orderInfo,orderStatus,orderActionColor }) => {
   // console.log(orderInfo);
   const {
     status,
@@ -155,7 +155,7 @@ const ShowOrderModal = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     <td className="px-4 py-3">
                       <Badge
                         size="sm"
-                        color={status === "pending" ? "warning" : "error"}
+                        color={status === orderStatus ? orderActionColor : "error"}
                       >
                         {status}
                       </Badge>

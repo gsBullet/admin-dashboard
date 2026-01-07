@@ -247,7 +247,7 @@ const PendingOrders = () => {
             </div>
             <div className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
               <Button size="sm" onClick={() => setShowCalendar(!showCalendar)}>
-                Pending Order Calander
+                 Calander
               </Button>
             </div>
             <div className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
@@ -457,6 +457,8 @@ const PendingOrders = () => {
         isEditOpen={isPendingOpen}
         setIsEditOpen={setIsPendingOpen}
         orderInfo={orderDetails}
+        orderStatus="pending"
+        orderActionColor="warning"
       />
       <EditPendingOrder
         isEditOpen={isEditOpen}

@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import {
   cancelOrdersByAdmin,
   completedOrdersByAdmin,
   getCompletedOrdersByAdmin,
+  getCompletedOrdersByAdminByDate,
 } from "../../service/order";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
@@ -24,27 +26,48 @@ import ShowOrderModal from "../../components/orderModal/ShowOrderModal";
 import EditPendingOrder from "./EditPendingOrder";
 import SweetAlert from "../../components/common/SweetAlert";
 import Swal from "sweetalert2";
+import DatePicker from "react-datepicker";
+import Button from "../../components/ui/button/Button";
+import TablePagination from "../Tables/TablePagination";
 
 const CompleteOrders = () => {
   const { auth } = useContext(AuthContext);
   const [penOrders, setPenOrders] = useState([]);
   const [showNoData, setShowNoData] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPendingOpen, setIsPendingOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("");
 
-  // const [searchTerm, setSearchTerm] = useState("");
+  const [dateByOrders, setDateByOrders] = useState("");
 
-  // const [isOpen, setIsOpen] = useState(false);
+  // const [orderDetails, setOrderDetails] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [pendingOrderByDate, setPendingOrderByDate] = useState([]);
   const [orderDetails, setOrderDetails] = useState(null);
   // console.log(auth);
+  const [searchTerm, setSearchTerm] = useState("");
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
     const fetchPendingOrders = async () => {
       setShowNoData(false);
       try {
-        const response = await getCompletedOrdersByAdmin(auth.token);
+        const response = await getCompletedOrdersByAdmin({
+          token: auth.token,
+          searchTerm,
+          limit,
+          currentPage,
+          paymentMethod,
+          dateByOrders,
+        });
         if (response.success) {
-          setPenOrders(response.data);
+          setPenOrders(response.data.orders);
+          setTotalItems(response.data.totalItems);
+          setTotalPages(response.data.totalPages);
+          setCurrentPage(response.data.currentPage);
         }
       } catch (error) {
         console.error("Error fetching pending orders:", error);
@@ -54,16 +77,37 @@ const CompleteOrders = () => {
     };
 
     fetchPendingOrders();
-  }, [auth.checkAuth]);
+  }, [
+    auth.checkAuth,
+    currentPage,
+    limit,
+    paymentMethod,
+    searchTerm,
+    dateByOrders,
+  ]);
+
+  useEffect(() => {
+    const fetchPendingOrders = async () => {
+      setShowNoData(false);
+      try {
+        const response = await getCompletedOrdersByAdminByDate({
+          token: auth.token,
+        });
+        if (response.success) {
+          setPendingOrderByDate(response.data.orders);
+        }
+      } catch (error) {
+        console.error("Error fetching pending orders:", error);
+      } finally {
+        setShowNoData(true);
+      }
+    };
+
+    fetchPendingOrders();
+  }, [auth.checkAuth, dateByOrders]);
 
   const handleShowOrder = (order) => {
     setIsPendingOpen(true);
-    setOrderDetails(order);
-  };
-  const handleEditOrder = (order) => {
-    // Implement the logic to confirm the order
-    console.log("Confirm order:", order);
-    setIsEditOpen(true);
     setOrderDetails(order);
   };
   const handleConfirmOrder = async (orderId) => {
@@ -107,52 +151,99 @@ const CompleteOrders = () => {
       });
     }
   };
+  const handleReset = () => {
+    setSearchTerm("");
+    setPaymentMethod("");
+    setDateByOrders("");
+  };
+
+  const handlePageSizeChange = (size) => {
+    setLimit(size);
+    setCurrentPage(1); // always start from page 1 when changing size
+  };
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+  const pendingOrderDates = pendingOrderByDate?.map(
+    (date) => new Date(date.updatedAt).toISOString().split("T")[0]
+  );
 
   return (
     <div>
       <PageMeta
-        title="Pending Orders"
-        description="Pending all Orders of our website"
+        title="Complete Orders"
+        description="Complete all Orders of our website"
       />
-      <PageBreadcrumb pageTitle="Pending Orders" />
-      <div className="space-y-6">
-        <ComponentCard title="Product Categories">
-          <div className="flex justify-end items-center">
-            <div className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+     {!showCalendar && <PageBreadcrumb pageTitle="Complete Orders" />}
+      <div className="flex justify-center items-center my-3">
+        {showCalendar && (
+          <DatePicker
+            // selected={dateByOrders}
+            // onChange={(date) => setDateByOrders(date)}
+            inline
+            highlightDates={[
+              {
+                "react-datepicker__day--highlighted-custom-1":
+                  pendingOrderDates,
+              },
+            ]}
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+            dateFormat="dd-MM-yyyy"
+          />
+        )}
+      </div>
+      <div className="space-y-1">
+        <ComponentCard title="Complete Orders">
+          <div className="flex justify-end items-center flex-wrap">
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
               <input
                 type="text"
                 placeholder="Search..."
+                value={searchTerm}
                 className="border border-gray-300 rounded px-2 py-1 mr-4"
-                // onChange={(e) => handleSearch(e.target.value)}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            {/* <div className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+              <DatePicker
+                selected={dateByOrders}
+                onChange={(date) => setDateByOrders(date)}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Search date .... "
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+                className="border border-gray-300 rounded px-2 py-1 mr-4"
+              />
+            </div>
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
               <select
                 className="border border-gray-300 rounded px-2 py-1 mr-4"
-                name="category"
-                id="category"
-                // onChange={(e) => setSearchCategory(e.target.value)}
+                name="paymentMethod"
+                id="paymentMethod"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
               >
-                <option value="">All Categories</option>
-                {category?.map((c) => (
-                  <option key={c._id} value={c._id}>
-                    {c.name}
-                  </option>
-                ))}
+                <option value="">Select Method</option>
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="bkash">Bkash</option>
+                <option value="nagad">Nagad</option>
+                <option value="rocket">Rocket</option>
               </select>
-            </div> */}
-            {/* <div className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
-              <select
-                className="border border-gray-300 rounded px-2 py-1 mr-4"
-                name="available"
-                id="available"
-                onChange={(e) => setAvailable(e.target.value)}
-              >
-                <option value="">All</option>
-                <option value="true">Available</option>
-                <option value="false">Not Available</option>
-              </select>
-            </div> */}
+            </div>
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+              <Button size="sm" onClick={() => setShowCalendar(!showCalendar)}>
+                Calander
+              </Button>
+            </div>
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+              <Button size="sm" onClick={handleReset}>
+                Reset
+              </Button>
+            </div>
           </div>
           <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
             <div className="max-w-full overflow-x-auto">
@@ -272,7 +363,7 @@ const CompleteOrders = () => {
                           {order.address}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
-                          {bdTimeFormat(order.createdAt)}
+                          {bdTimeFormat(order.updatedAt)}
                         </TableCell>
                         {/* badge cell  */}
                         <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
@@ -298,21 +389,7 @@ const CompleteOrders = () => {
                                 title="view order"
                               ></i>
                             </button>
-                            <button
-                              onClick={() => handleEditOrder(order)}
-                              disabled={order.status === false}
-                              className={`text-blue-600   dark:text-blue-400 px-1 py-1${
-                                order.status === false
-                                  ? " cursor-not-allowed opacity-30 "
-                                  : " hover:text-white hover:bg-blue-600 rounded"
-                              }`}
-                            >
-                              <i
-                                className="fa fa-edit text-xl "
-                                aria-hidden="true"
-                                title="edit order"
-                              ></i>
-                            </button>
+
                             <button
                               disabled={order.status === true}
                               onClick={() => handleConfirmOrder(order._id)}
@@ -338,14 +415,14 @@ const CompleteOrders = () => {
             </div>
           </div>
           <div>
-            {/* <TablePagination
-              totalItems={totalProducts}
+            <TablePagination
+              totalItems={totalItems}
               currentPage={currentPage}
               totalPages={totalPages}
               pageSize={limit}
               onPageChange={handlePageChange}
               onPageSizeChange={handlePageSizeChange}
-            /> */}
+            />
           </div>
         </ComponentCard>
       </div>
@@ -355,11 +432,8 @@ const CompleteOrders = () => {
         isEditOpen={isPendingOpen}
         setIsEditOpen={setIsPendingOpen}
         orderInfo={orderDetails}
-      />
-      <EditPendingOrder
-        isEditOpen={isEditOpen}
-        setIsEditOpen={setIsEditOpen}
-        orderInfo={orderDetails}
+        orderStatus={"confirmed"}
+        orderActionColor={"primary"}
       />
     </div>
   );

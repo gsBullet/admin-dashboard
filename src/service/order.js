@@ -18,11 +18,25 @@ export const pendingOrdersByAdmin = async (
   );
   return response.data;
 };
-export const pendingOrdersByAdminByDate = async (
+export const pendingOrdersByAdminByDate = async (token) => {
+  const response = await Axios.get(`/orders/pending-orders-by-date`, {
+    headers: {
+      Authorization: `EcomToken ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const getCompletedOrdersByAdmin = async ({
   token,
-) => {
+  searchTerm,
+  limit,
+  currentPage,
+  paymentMethod,
+  dateByOrders,
+}) => {
   const response = await Axios.get(
-    `/orders/pending-orders-by-date`,
+    `/orders/get-completed-orders?limit=${limit}&currentPage=${currentPage}&searchTerm=${searchTerm}&paymentMethod=${paymentMethod}&dateByOrders=${dateByOrders}`,
     {
       headers: {
         Authorization: `EcomToken ${token}`,
@@ -31,13 +45,17 @@ export const pendingOrdersByAdminByDate = async (
   );
   return response.data;
 };
-
-export const getCompletedOrdersByAdmin = async (token) => {
-  const response = await Axios.get("/orders/get-completed-orders", {
-    headers: {
-      Authorization: `EcomToken ${token}`,
-    },
-  });
+export const getCompletedOrdersByAdminByDate = async ({
+  token,
+}) => {
+  const response = await Axios.get(
+    `/orders/get-completed-orders-by-date`,
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    }
+  );
   return response.data;
 };
 
