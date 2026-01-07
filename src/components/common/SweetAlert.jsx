@@ -18,7 +18,7 @@ const SweetAlert = ({
       toast: true,
       position: "bottom-end",
       showConfirmButton: false,
-      timer: 1500,
+      timer: 1000,
       timerProgressBar: true,
       background: "#fff",
       didOpen: (toast) => {

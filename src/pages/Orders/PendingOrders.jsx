@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import {
   cancelOrdersByAdmin,
-  completedOrdersByAdmin,
+  completedOrdersFromPending,
   pendingOrdersByAdmin,
   pendingOrdersByAdminByDate,
 } from "../../service/order";
@@ -91,6 +91,7 @@ const PendingOrders = () => {
     dateByOrders,
   ]);
 
+  // pendingOrdersByAdminByDate
   useEffect(() => {
     const fetchPendingOrders = async () => {
       setShowNoData(false);
@@ -148,11 +149,14 @@ const PendingOrders = () => {
 
     // ✅ CONFIRM
     if (result.isConfirmed) {
-      await completedOrdersByAdmin(orderId, auth.token);
+      await completedOrdersFromPending(orderId, auth.token);
+      setPenOrders((prevOrders) =>
+        prevOrders.filter((order) => order._id !== orderId)
+      );
       SweetAlert({
         type: "toast",
         icon: "success",
-        title: "Order Confirmed",
+        title: "Order Confirmed Successfully",
       });
     }
 
@@ -162,7 +166,7 @@ const PendingOrders = () => {
       SweetAlert({
         type: "toast",
         icon: "warning",
-        title: "Order Cancelled",
+        title: "Order Cancelled Successfully",
       });
     }
   };
@@ -190,7 +194,8 @@ const PendingOrders = () => {
         description="Pending all Orders of our website"
       />
       <PageBreadcrumb pageTitle="Pending Orders" />
-      {showCalendar && (
+      <div className="flex justify-center items-center my-2">
+        {showCalendar && (
         <DatePicker
           // selected={dateByOrders}
           // onChange={(date) => setDateByOrders(date)}
@@ -206,8 +211,9 @@ const PendingOrders = () => {
           dateFormat="dd-MM-yyyy"
         />
       )}
+      </div>
       <div className="space-y-6">
-        <ComponentCard title="Pending Orders">
+        <ComponentCard title={`Total Pending Orders: ${totalItems}`}>
           <div className="flex justify-end items-center">
             <div className="px-4 py-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
               <input

@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import {
   cancelOrdersByAdmin,
-  completedOrdersByAdmin,
+  deliveredOrdersFromCompleted,
   getCompletedOrdersByAdmin,
   getCompletedOrdersByAdminByDate,
 } from "../../service/order";
@@ -23,7 +23,6 @@ import Badge from "../../components/ui/badge/Badge";
 import bdTimeFormat from "../../components/common/bdTimeFormat";
 
 import ShowOrderModal from "../../components/orderModal/ShowOrderModal";
-import EditPendingOrder from "./EditPendingOrder";
 import SweetAlert from "../../components/common/SweetAlert";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
@@ -121,7 +120,7 @@ const CompleteOrders = () => {
       showDenyButton: true,
       showCancelButton: false,
 
-      confirmButtonText: "Confirm Order",
+      confirmButtonText: "Delivered Order",
       denyButtonText: "Cancel Order",
 
       confirmButtonColor: "#16a34a",
@@ -133,11 +132,14 @@ const CompleteOrders = () => {
 
     if (result.isConfirmed) {
       // ✅ CONFIRM ORDER
-      await completedOrdersByAdmin(orderId, auth.token);
+      await deliveredOrdersFromCompleted(orderId, auth.token);
+      setPenOrders((prevOrders) =>
+        prevOrders.filter((order) => order._id !== orderId)
+      );
       SweetAlert({
         type: "toast",
         icon: "success",
-        title: "Order Confirmed",
+        title: "Order Delivered Successfully",
       });
     }
 
@@ -147,7 +149,7 @@ const CompleteOrders = () => {
       SweetAlert({
         type: "toast",
         icon: "success",
-        title: "Order Cancelled",
+        title: "Order Cancelled Successfully",
       });
     }
   };
@@ -174,7 +176,7 @@ const CompleteOrders = () => {
         title="Complete Orders"
         description="Complete all Orders of our website"
       />
-     {!showCalendar && <PageBreadcrumb pageTitle="Complete Orders" />}
+      {!showCalendar && <PageBreadcrumb pageTitle="Complete Orders" />}
       <div className="flex justify-center items-center my-3">
         {showCalendar && (
           <DatePicker
@@ -195,7 +197,7 @@ const CompleteOrders = () => {
         )}
       </div>
       <div className="space-y-1">
-        <ComponentCard title="Complete Orders">
+        <ComponentCard title={`Total Completed Orders: ${totalItems}`}>
           <div className="flex justify-end items-center flex-wrap">
             <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
               <input
@@ -313,6 +315,12 @@ const CompleteOrders = () => {
                         isHeader
                         className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
                       >
+                        Confirmed Date
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
                         Status
                       </TableCell>
                       <TableCell
@@ -361,6 +369,9 @@ const CompleteOrders = () => {
 
                         <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
                           {order.address}
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
+                          {bdTimeFormat(order.createdAt)}
                         </TableCell>
                         <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
                           {bdTimeFormat(order.updatedAt)}

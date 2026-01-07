@@ -1,523 +1,456 @@
-import React, { useState } from "react";
-import Input from "../../components/form/input/InputField";
-import Select from "../../components/form/Select";
+
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import {
+  cancelOrdersByAdmin,
+  deliveredOrdersByAdmin,
+  deliveredOrdersByAdminByDate,
+  deliveredOrdersFromCompleted,
+} from "../../service/order";
+import PageMeta from "../../components/common/PageMeta";
+import PageBreadcrumb from "../../components/common/PageBreadCrumb";
+import ComponentCard from "../../components/common/ComponentCard";
+import LoadingBtn from "../UiElements/LoadingBtn";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
+import Switch from "../../components/form/switch/Switch";
 import Badge from "../../components/ui/badge/Badge";
+import bdTimeFormat from "../../components/common/bdTimeFormat";
+
+import ShowOrderModal from "../../components/orderModal/ShowOrderModal";
+import SweetAlert from "../../components/common/SweetAlert";
+import Swal from "sweetalert2";
+import DatePicker from "react-datepicker";
+import Button from "../../components/ui/button/Button";
+import TablePagination from "../Tables/TablePagination";
+import "./css/order.css";
 
 const DeleveredOrders = () => {
-  const initialOrder = {
-    customerInfo: {
-      fullName: "Tatyana Quinn",
-      email: "xewageloju@mailinator.com",
-      phone: "+1 (242) 273-6429",
-      address: "Qui perspiciatis de",
-      city: "Eum in voluptas ut s",
-      state: "In sit unde ipsam s",
-      postCode: "28",
-      delivery: "inside-dhaka",
-      paymentMethod: "rocket",
-    },
-    orderDate: "Dec 24, 2025, 02:51 PM",
-    products: [
-      {
-        id: "B-01",
-        name: "Kids Jumper with smart looking",
-        category: "Kids",
-        quantity: 3,
-        available: "Yes",
-        status: "pending",
-        price: 75,
-      },
-      {
-        id: "H-02",
-        name: "Jacket with white and ash color mix, modern design, attractive",
-        category: "Men",
-        quantity: 1,
-        available: "Yes",
-        status: "pending",
-        price: 139,
-      },
-    ],
-    summary: {
-      totalProducts: 2,
-      paymentMethod: "rocket",
-      traId: "Laboriosam amet mo",
-      totalQuantity: 4,
-      deliveryCost: 4,
-      totalAmount: 424,
-    },
-    shopInfo: {
-      name: "Bannah Shop",
-      address: "123 Market Street, Suite 500",
-      location: "New York, NY 10001",
-      email: "óMnMS@example.com",
-      phone: "(123) 456-7890",
-    },
-  };
+  const { auth } = useContext(AuthContext);
+  const [penOrders, setPenOrders] = useState([]);
+  const [showNoData, setShowNoData] = useState(false);
+  const [isPendingOpen, setIsPendingOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("");
 
-  const [order, setOrder] = useState(initialOrder);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dateByOrders, setDateByOrders] = useState("");
 
-  // Handle customer info changes
-  const handleCustomerInfoChange = (field, value) => {
-    setOrder((prev) => ({
-      ...prev,
-      customerInfo: {
-        ...prev.customerInfo,
-        [field]: value,
-      },
-    }));
-  };
+  // const [orderDetails, setOrderDetails] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [deliveredOrderByDate, setDeliveredOrderByDate] = useState([]);
+  const [orderDetails, setOrderDetails] = useState(null);
+  // console.log(auth);
+  const [searchTerm, setSearchTerm] = useState("");
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
-  // Handle product changes
-  const handleProductChange = (index, field, value) => {
-    const updatedProducts = [...order.products];
-    updatedProducts[index] = {
-      ...updatedProducts[index],
-      [field]:
-        field === "quantity" || field === "price" ? Number(value) : value,
+  useEffect(() => {
+    const fetchDeliveredOrders = async () => {
+      setShowNoData(false);
+      try {
+        const response = await deliveredOrdersByAdmin({
+          token: auth.token,
+          searchTerm,
+          limit,
+          currentPage,
+          paymentMethod,
+          dateByOrders,
+        });
+        if (response.success) {
+          setPenOrders(response.data.orders);
+          setTotalItems(response.data.totalItems);
+          setTotalPages(response.data.totalPages);
+          setCurrentPage(response.data.currentPage);
+        }
+      } catch (error) {
+        console.error("Error fetching pending orders:", error);
+      } finally {
+        setShowNoData(true);
+      }
     };
 
-    // Recalculate totals
-    const totalQuantity = updatedProducts.reduce(
-      (sum, product) => sum + product.quantity,
-      0
-    );
-    const productsTotal = updatedProducts.reduce(
-      (sum, product) => sum + product.quantity * product.price,
-      0
-    );
-    const totalAmount = productsTotal + order.summary.deliveryCost;
+    fetchDeliveredOrders();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    auth.checkAuth,
+    currentPage,
+    limit,
+    paymentMethod,
+    searchTerm,
+    dateByOrders,
+  ]);
 
-    setOrder((prev) => ({
-      ...prev,
-      products: updatedProducts,
-      summary: {
-        ...prev.summary,
-        totalProducts: updatedProducts.length,
-        totalQuantity,
-        totalAmount,
-      },
-    }));
+  // deliveredOrdersByAdminByDate
+  useEffect(() => {
+    const fetchDeliveredOrders = async () => {
+      setShowNoData(false);
+      try {
+        const response = await deliveredOrdersByAdminByDate({
+          token: auth.token,
+        });
+        if (response.success) {
+          setDeliveredOrderByDate(response.data.orders);
+        }
+      } catch (error) {
+        console.error("Error fetching pending orders:", error);
+      } finally {
+        setShowNoData(true);
+      }
+    };
+
+    fetchDeliveredOrders();
+  }, [auth.checkAuth, dateByOrders]);
+
+  const handleShowOrder = (order) => {
+    setIsPendingOpen(true);
+    setOrderDetails(order);
   };
+  const handleConfirmOrder = async (orderId) => {
+    const result = await Swal.fire({
+      title: "Make a Order Action",
+      icon: "question",
 
-  // Handle summary changes
-  const handleSummaryChange = (field, value) => {
-    const numericValue =
-      field === "deliveryCost" || field === "totalAmount"
-        ? Number(value)
-        : value;
+      showCloseButton: true, // ❌ close icon
+      closeButtonAriaLabel: "Close",
 
-    setOrder((prev) => ({
-      ...prev,
-      summary: {
-        ...prev.summary,
-        [field]: numericValue,
-      },
-    }));
-  };
+      showDenyButton: true,
+      showCancelButton: false,
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+      confirmButtonText: "Returned Order",
+      denyButtonText: "Cancel Order",
 
-    try {
-      // Here you would typically send the updated order to your API
-      console.log("Updated Order:", order);
-      alert("Order updated successfully!");
-    } catch (error) {
-      console.error("Error updating order:", error);
-      alert("Failed to update order. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+      confirmButtonColor: "#16a34a",
+      denyButtonColor: "#dc2626",
+
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    if (result.isConfirmed) {
+      // ✅ CONFIRM ORDER
+      await deliveredOrdersFromCompleted(orderId, auth.token);
+      setPenOrders((prevOrders) =>
+        prevOrders.filter((order) => order._id !== orderId)
+      );
+      SweetAlert({
+        type: "toast",
+        icon: "success",
+        title: "Order Delivered Successfully",
+      });
+    }
+
+    if (result.isDenied) {
+      // ❌ CANCEL ORDER
+      await cancelOrdersByAdmin(orderId, auth.token);
+      SweetAlert({
+        type: "toast",
+        icon: "success",
+        title: "Order Cancelled Successfully",
+      });
     }
   };
-
-  // Handle reset
   const handleReset = () => {
-    setOrder(initialOrder);
+    setSearchTerm("");
+    setPaymentMethod("");
+    setDateByOrders("");
   };
 
+  const handlePageSizeChange = (size) => {
+    setLimit(size);
+    setCurrentPage(1); // always start from page 1 when changing size
+  };
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+  const deliveredOrderDates = deliveredOrderByDate?.map(
+    (date) => new Date(date.updatedAt).toISOString().split("T")[0]
+  );
+
+  console.log(deliveredOrderByDate);
+
   return (
-    <div className="relative w-full max-6xl mx-auto overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-      <div className="">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="mb-3 text-4xl font-semibold text-gray-800 dark:text-white/90 text-center ">
-            Edit Order Details
-          </h1>
-          <p className="text-gray-800 dark:text-white/90 text-center ">
-            Order Date: {order.orderDate}
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-8 ">
-          {/* Customer Information Card */}
-          <div className="border rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90 mb-4 pb-2 border-b">
-              Customer Information
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-white/90  mb-1">
-                  Full Name
-                </label>
-                <Input
-                  type="text"
-                  value={order.customerInfo.fullName}
-                  onChange={(e) =>
-                    handleCustomerInfoChange("fullName", e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
-                  Email
-                </label>
-                <Input
-                  type="email"
-                  value={order.customerInfo.email}
-                  onChange={(e) =>
-                    handleCustomerInfoChange("email", e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
-                  Phone
-                </label>
-                <Input
-                  type="tel"
-                  value={order.customerInfo.phone}
-                  onChange={(e) =>
-                    handleCustomerInfoChange("phone", e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
-                  City
-                </label>
-                <Input
-                  type="text"
-                  value={order.customerInfo.city}
-                  onChange={(e) =>
-                    handleCustomerInfoChange("city", e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
-                  Address
-                </label>
-                <Input
-                  type="text"
-                  value={order.customerInfo.address}
-                  onChange={(e) =>
-                    handleCustomerInfoChange("address", e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
-                  State
-                </label>
-                <Input
-                  type="text"
-                  value={order.customerInfo.state}
-                  onChange={(e) =>
-                    handleCustomerInfoChange("state", e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
-                  Post Code
-                </label>
-                <Input
-                  type="text"
-                  value={order.customerInfo.postCode}
-                  onChange={(e) =>
-                    handleCustomerInfoChange("postCode", e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
-                  Delivery Method
-                </label>
-                <Select
-                  defaultValue={order.customerInfo.delivery}
-                  onChange={(e) =>
-                    handleCustomerInfoChange("delivery", e.target.value)
-                  }
-                  options={[
-                    { value: "inside-dhaka", label: "Inside Dhaka" },
-                    { value: "outside-dhaka", label: "Outside Dhaka" },
-                    { value: "international", label: "International" },
-                  ]}
-                ></Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
-                  Payment Method
-                </label>
-                <Input
-                  type="text"
-                  value={order.customerInfo.paymentMethod}
-                  readOnly
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Products Card */}
-          <div className="border rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90 mb-4 pb-2 border-b">
-              Order Items
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y text-gray-800 dark:text-white/90">
-                <thead className="bg-gray-50 dark:bg-gray-800">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
-                      Product ID
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
-                      Product Name
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
-                      Category
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
-                      Quantity
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
-                      Available
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
-                      Price
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className=" divide-y divide-gray-200">
-                  {order.products.map((product, index) => (
-                    <tr
-                      key={product.id}
-                      className="dark:hover:bg-gray-700 hover:bg-gray-50"
-                    >
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800 dark:text-white/90">
-                        {product.id}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-white/90">
-                        {product.name}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-white/90">
-                        {product.category}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Input
-                          type="number"
-                          min="1"
-                          value={product.quantity}
-                          onChange={(e) =>
-                            handleProductChange(
-                              index,
-                              "quantity",
-                              e.target.value
-                            )
-                          }
-                          className="w-20 "
-                        />
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge
-                          size="sm"
-                          color={
-                            product.available === "Yes" ? "success" : "error"
-                          }
-                        >
-                          {product.available}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge
-                          size="sm"
-                          color={
-                            product.status === "pending" ? "warning" : "error"
-                          }
-                        >
-                          {product.status}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center">
-                          <span className="mr-1">$</span>
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={product.price}
-                            onChange={(e) =>
-                              handleProductChange(
-                                index,
-                                "price",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Order Summary Card */}
-          <div className="border rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90 mb-4 pb-2 border-b">
-              Order Summary
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                  Total Products
-                </label>
-                <Input
-                  type="text"
-                  value={order.summary.totalProducts}
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-white/90 mb-1">
-                  Payment Method
-                </label>
-                <Input
-                  type="text"
-                  value={order.summary.paymentMethod}
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-white/90 mb-1">
-                  Transaction ID
-                </label>
-                <Input
-                  type="text"
-                  value={order.summary.traId}
-                  onChange={(e) => handleSummaryChange("traId", e.target.value)}
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-white/90 mb-1">
-                  Total Quantity
-                </label>
-                <Input
-                  type="text"
-                  value={order.summary.totalQuantity}
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-white/90 mb-1">
-                  Delivery Cost ($)
-                </label>
-                <Input
-                  type="text"
-                  value={order.summary.deliveryCost}
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-white/90 mb-1">
-                  Total Amount ($)
-                </label>
-                <Input
-                  type="text"
-                  value={order.summary.totalAmount}
-                  readOnly
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Shop Information (Read-only) */}
-          <div className=" rounded-lg p-6 border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-2">
-              Shop Information
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-800 dark:text-white/90">
-                  Shop Name
-                </p>
-                <p className="font-medium dark:text-gray-500">
-                  {order.shopInfo.name}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-800 dark:text-white/90">
-                  Address
-                </p>
-                <p className="font-medium dark:text-gray-500">
-                  {order.shopInfo.address}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-800 dark:text-white/90">
-                  Location
-                </p>
-                <p className="font-medium dark:text-gray-500">
-                  {order.shopInfo.location}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-800 dark:text-white/90">
-                  Email
-                </p>
-                <p className="font-medium dark:text-gray-500">
-                  {order.shopInfo.email}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-800 dark:text-white/90">
-                  Phone
-                </p>
-                <p className="font-medium dark:text-gray-500">
-                  {order.shopInfo.phone}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 pt-4 border-t">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="px-6 py-2 border border-gray-300 dark:border-gray-50 text-gray-700 dark:text-white/90 rounded-md hover:bg-gray-50 dark:hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Reset Changes
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {isSubmitting ? "Updating..." : "Update Order"}
-            </button>
-          </div>
-        </form>
+    <div>
+      <PageMeta
+        title="Delivered Orders"
+        description="Delivered all Orders of our website"
+      />
+      {!showCalendar && <PageBreadcrumb pageTitle="Delivered Orders" />}
+      <div className="flex justify-center items-center my-3">
+        {showCalendar && (
+          <DatePicker
+            // selected={dateByOrders}
+            // onChange={(date) => setDateByOrders(date)}
+            inline
+            highlightDates={[
+              {
+                "react-datepicker__day--highlighted-custom-1":
+                  deliveredOrderDates,
+              },
+            ]}
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
+            dateFormat="dd-MM-yyyy"
+          />
+        )}
       </div>
+      <div className="space-y-1">
+        <ComponentCard title={`Total Delivered Orders: ${totalItems} `}>
+          <div className="flex justify-end items-center flex-wrap">
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                className="border border-gray-300 rounded px-2 py-1 mr-4"
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+              <DatePicker
+                selected={dateByOrders}
+                onChange={(date) => setDateByOrders(date)}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Search date .... "
+                showMonthDropdown
+                showYearDropdown
+                dropdownMode="select"
+                className="border border-gray-300 rounded px-2 py-1 mr-4"
+              />
+            </div>
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+              <select
+                className="border border-gray-300 rounded px-2 py-1 mr-4"
+                name="paymentMethod"
+                id="paymentMethod"
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              >
+                <option value="">Select Method</option>
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="bkash">Bkash</option>
+                <option value="nagad">Nagad</option>
+                <option value="rocket">Rocket</option>
+              </select>
+            </div>
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+              <Button size="sm" onClick={() => setShowCalendar(!showCalendar)}>
+                Calander
+              </Button>
+            </div>
+            <div className="px-4 pb-3 text-gray-500 text-end text-theme-sm dark:text-gray-400">
+              <Button size="sm" onClick={handleReset}>
+                Reset
+              </Button>
+            </div>
+          </div>
+          <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/5 dark:bg-white/3">
+            <div className="max-w-full overflow-x-auto">
+              {penOrders.length === 0 ? (
+                <div className="flex justify-center items-center my-10">
+                  {!showNoData ? (
+                    <LoadingBtn />
+                  ) : (
+                    <p className="text-gray-500 text-lg">No data found</p>
+                  )}
+                </div>
+              ) : (
+                <Table className={""}>
+                  {/* Table Header */}
+                  <TableHeader className="border-b border-gray-800 dark:border-white/90   ">
+                    <TableRow className={"text-center"}>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Transaction ID
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Payment Method
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Phone Number
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Quantity
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Payment Amount
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Total Amount
+                      </TableCell>
+
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Address
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Order Date
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Delivery Date
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Status
+                      </TableCell>
+                      <TableCell
+                        isHeader
+                        className="px-5 py-3 font-bold text-gray-800 text-start text-theme-xs dark:text-white/90"
+                      >
+                        Actions
+                      </TableCell>
+                    </TableRow>
+                  </TableHeader>
+
+                  {/* Table Body */}
+
+                  <TableBody className="divide-y divide-gray-100 dark:divide-white/50">
+                    {penOrders?.map((order) => (
+                      <TableRow key={order._id}>
+                        <TableCell className="px-5 py-4 sm:px-6 text-start">
+                          <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {order.trxId}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-5 py-4 sm:px-6 text-start">
+                          <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {order.paymentMethod}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-5 py-4 sm:px-6 text-start">
+                          <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {order.phone}
+                          </span>
+                        </TableCell>
+
+                        <TableCell className="px-5 py-4 sm:px-6 text-start">
+                          <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {order.quantity}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-5 py-4 sm:px-6 text-start">
+                          <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            ${order.payAmount}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
+                          ${order.totalAmount}
+                        </TableCell>
+
+                        <TableCell className="px-4 py-3 font-medium text-gray-800 text-start text-theme-sm dark:text-white/90">
+                          {order.address}
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
+                          {bdTimeFormat(order.createdAt)}
+                        </TableCell>
+                        <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
+                          {bdTimeFormat(order.updatedAt)}
+                        </TableCell>
+                        {/* badge cell  */}
+                        <TableCell className="px-4 py-3 text-gray-800 text-start text-theme-sm dark:text-white/90">
+                          <Badge
+                            size="sm"
+                            color={
+                              order.status === "delivered" ? "success" : "error"
+                            }
+                          >
+                            {order.status}
+                          </Badge>
+                        </TableCell>
+                        {/* action cells */}
+                        <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                          <div className="flex gap-3">
+                            <button
+                              onClick={() => handleShowOrder(order)}
+                              className="text-green-600  hover:bg-green-600 rounded dark:text-green-400 px-1 py-1"
+                            >
+                              <i
+                                className="fa fa-book-open  text-xl hover:text-white"
+                                aria-hidden="true"
+                                title="view order"
+                              ></i>
+                            </button>
+
+                            <button
+                              disabled={order.status === true}
+                              onClick={() => handleConfirmOrder(order._id)}
+                              className={`text-orange-600   px-1 py-1 ${
+                                order.status === true
+                                  ? " cursor-not-allowed opacity-30 "
+                                  : " hover:text-white hover:bg-orange-600 rounded"
+                              }`}
+                            >
+                              <i
+                                class="fas fa-bolt text-xl px-1"
+                                aria-hidden="true"
+                                title="confirm order"
+                              ></i>
+                            </button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
+          </div>
+          <div>
+            <TablePagination
+              totalItems={totalItems}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={limit}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
+          </div>
+        </ComponentCard>
+      </div>
+
+      {/* show order modal */}
+      <ShowOrderModal
+        isEditOpen={isPendingOpen}
+        setIsEditOpen={setIsPendingOpen}
+        orderInfo={orderDetails}
+        orderStatus={"delivered"}
+        orderActionColor={"success"}
+      />
     </div>
   );
 };

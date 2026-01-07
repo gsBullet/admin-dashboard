@@ -45,26 +45,32 @@ export const getCompletedOrdersByAdmin = async ({
   );
   return response.data;
 };
-export const getCompletedOrdersByAdminByDate = async ({
-  token,
-}) => {
+export const getCompletedOrdersByAdminByDate = async ({ token }) => {
+  const response = await Axios.get(`/orders/get-completed-orders-by-date`, {
+    headers: {
+      Authorization: `EcomToken ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const completedOrdersFromPending = async (orderId, token) => {
+  const response = await Axios.get(`/orders/completed-orders/${orderId}`, {
+    headers: {
+      Authorization: `EcomToken ${token}`,
+    },
+  });
+  return response.data;
+};
+export const deliveredOrdersFromCompleted = async (orderId, token) => {
   const response = await Axios.get(
-    `/orders/get-completed-orders-by-date`,
+    `/orders/delevered-orders-from-completed/${orderId}`,
     {
       headers: {
         Authorization: `EcomToken ${token}`,
       },
     }
   );
-  return response.data;
-};
-
-export const completedOrdersByAdmin = async (orderId, token) => {
-  const response = await Axios.get(`/orders/completed-orders/${orderId}`, {
-    headers: {
-      Authorization: `EcomToken ${token}`,
-    },
-  });
   return response.data;
 };
 export const cancelOrdersByAdmin = async (orderId, token) => {
@@ -75,8 +81,26 @@ export const cancelOrdersByAdmin = async (orderId, token) => {
   });
   return response.data;
 };
-export const deliveredOrdersByAdmin = async (token) => {
-  const response = await Axios.get("/orders/delivered-orders", {
+export const deliveredOrdersByAdmin = async ({
+  token,
+  searchTerm,
+  limit,
+  currentPage,
+  paymentMethod,
+  dateByOrders,
+}) => {
+  const response = await Axios.get(
+    `/orders/delivered-orders?limit=${limit}&currentPage=${currentPage}&searchTerm=${searchTerm}&paymentMethod=${paymentMethod}&dateByOrders=${dateByOrders}`,
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+export const deliveredOrdersByAdminByDate = async ({ token }) => {
+  const response = await Axios.get("/orders/delivered-orders-by-date", {
     headers: {
       Authorization: `EcomToken ${token}`,
     },
