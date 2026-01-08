@@ -390,7 +390,7 @@ const PendingOrders = () => {
                               order.status === "pending" ? "warning" : "error"
                             }
                           >
-                            {order.status}
+                            {order.status.toUpperCase()}
                           </Badge>
                         </TableCell>
                         {/* action cells */}

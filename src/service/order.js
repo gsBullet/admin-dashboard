@@ -26,6 +26,32 @@ export const pendingOrdersByAdminByDate = async (token) => {
   });
   return response.data;
 };
+export const returnOrdersByAdmin = async ({
+  token,
+  limit,
+  currentPage,
+  searchTerm,
+  paymentMethod,
+  dateByOrders,
+}) => {
+  const response = await Axios.get(
+    `/orders/return-orders?limit=${limit}&currentPage=${currentPage}&searchTerm=${searchTerm}&paymentMethod=${paymentMethod}&dateByOrders=${dateByOrders}`,
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+export const returnOrdersByAdminByDate = async ({ token }) => {
+  const response = await Axios.get(`/orders/return-orders-by-date`, {
+    headers: {
+      Authorization: `EcomToken ${token}`,
+    },
+  });
+  return response.data;
+};
 
 export const getCompletedOrdersByAdmin = async ({
   token,
@@ -125,15 +151,12 @@ export const deliveredOrdersByAdminByDate = async ({ token }) => {
   });
   return response.data;
 };
-export const deleteOrderByAdmin = async ({token, orderId}) => {
-  const response = await Axios.get(
-    `/orders/delete-order-by-admin/${orderId}`,
-    {
-      headers: {
-        Authorization: `EcomToken ${token}`,
-      },
-    }
-  );
+export const deleteOrderByAdmin = async ({ token, orderId }) => {
+  const response = await Axios.get(`/orders/delete-order-by-admin/${orderId}`, {
+    headers: {
+      Authorization: `EcomToken ${token}`,
+    },
+  });
   return response.data;
 };
 export const orderDetailsByAdmin = async (token, orderId) => {

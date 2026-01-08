@@ -416,7 +416,7 @@ const DeleveredOrders = () => {
                               order.status === "delivered" ? "success" : "error"
                             }
                           >
-                            {order.status}
+                            {order.status?.toUpperCase()}
                           </Badge>
                         </TableCell>
                         {/* action cells */}

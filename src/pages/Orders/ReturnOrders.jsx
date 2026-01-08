@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import {
-  cancelOrdersByAdmin,
-  cancelOrdersByAdminByDate,
   deleteOrderByAdmin,
+  returnOrdersByAdmin,
+  returnOrdersByAdminByDate,
 } from "../../service/order";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
@@ -49,10 +49,10 @@ const ReturnOrders = () => {
   const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
-    const fetchCencelledOrders = async () => {
+    const fetchReturnOrders = async () => {
       setShowNoData(false);
       try {
-        const response = await cancelOrdersByAdmin({
+        const response = await returnOrdersByAdmin({
           token: auth.token,
           searchTerm,
           limit,
@@ -73,7 +73,7 @@ const ReturnOrders = () => {
       }
     };
 
-    fetchCencelledOrders();
+    fetchReturnOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     auth.checkAuth,
@@ -86,10 +86,10 @@ const ReturnOrders = () => {
 
   // cancelOrdersByAdminByDate
   useEffect(() => {
-    const fetchCencelledOrders = async () => {
+    const fetchReturnOrders = async () => {
       setShowNoData(false);
       try {
-        const response = await cancelOrdersByAdminByDate({
+        const response = await returnOrdersByAdminByDate({
           token: auth.token,
         });
         if (response.success) {
@@ -102,7 +102,7 @@ const ReturnOrders = () => {
       }
     };
 
-    fetchCencelledOrders();
+    fetchReturnOrders();
   }, [auth.checkAuth, dateByOrders]);
 
   const handleShowOrder = (order) => {
@@ -158,8 +158,8 @@ const ReturnOrders = () => {
   return (
     <div>
       <PageMeta
-        title="Complete Orders"
-        description="Complete all Orders of our website"
+        title="Return Orders"
+        description="Return all Orders of our website"
       />
       {!showCalendar && <PageBreadcrumb pageTitle="Complete Orders" />}
       <div className="flex justify-center items-center my-3">
@@ -366,10 +366,10 @@ const ReturnOrders = () => {
                           <Badge
                             size="sm"
                             color={
-                              order.status === "cancelled" ? "error" : "success"
+                              order.status === "returned" ? "info" : "success"
                             }
                           >
-                            {order.status}
+                            {order.status.toUpperCase()}
                           </Badge>
                         </TableCell>
                         {/* action cells */}
@@ -428,8 +428,8 @@ const ReturnOrders = () => {
         isEditOpen={isPendingOpen}
         setIsEditOpen={setIsPendingOpen}
         orderInfo={orderDetails}
-        orderStatus={"confirmed"}
-        orderActionColor={"primary"}
+        orderStatus={"returned"}
+        orderActionColor={"info"}
       />
     </div>
   );

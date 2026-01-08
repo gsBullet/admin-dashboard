@@ -385,7 +385,7 @@ const CompleteOrders = () => {
                               order.status === "confirmed" ? "primary" : "error"
                             }
                           >
-                            {order.status}
+                            {order.status.toUpperCase()}
                           </Badge>
                         </TableCell>
                         {/* action cells */}

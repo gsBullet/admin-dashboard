@@ -370,7 +370,7 @@ const CancelledOrders = () => {
                               order.status === "cancelled" ? "error" : "success"
                             }
                           >
-                            {order.status}
+                            {order.status.toUpperCase()}
                           </Badge>
                         </TableCell>
                         {/* action cells */}

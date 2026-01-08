@@ -29,16 +29,16 @@ const navItems = [
     icon: <i className="fas fa-snowflake text-lg"></i>,
     name: "Category",
     subItems: [
-      { name: "Add Category", path: "/add-category",  },
-      { name: "List of Category", path: "/all-category",  },
+      { name: "Add Category", path: "/add-category" },
+      { name: "List of Category", path: "/all-category" },
     ],
   },
   {
     icon: <i className="fa fa-list text-lg" aria-hidden="true"></i>,
     name: "Product",
     subItems: [
-      { name: "Add Product", path: "/add-product",  },
-      { name: "List of Product", path: "/all-products",  },
+      { name: "Add Product", path: "/add-product" },
+      { name: "List of Product", path: "/all-products" },
     ],
   },
   {
@@ -50,37 +50,37 @@ const navItems = [
     name: "Users",
     icon: <UsersIcon />,
     subItems: [
-      { name: "Add User", path: "/add-user",  },
-      { name: "List of Users", path: "/all-users",  },
+      { name: "Add User", path: "/add-user" },
+      { name: "List of Users", path: "/all-users" },
     ],
   },
   {
     name: "Role Management",
     icon: <UsersIcon />,
     subItems: [
-      { name: "Add User Role", path: "/add-user-role",  },
-      { name: "List of User Roles", path: "/all-user-roles",  },
+      { name: "Add User Role", path: "/add-user-role" },
+      { name: "List of User Roles", path: "/all-user-roles" },
     ],
   },
   {
     name: "Tables",
     icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables",  }],
+    subItems: [{ name: "Basic Tables", path: "/basic-tables" }],
   },
   {
     name: "Pages",
     icon: <PageIcon />,
     subItems: [
-      { name: "Blank Page", path: "/blank",  },
-      { name: "404 Error", path: "/error-404",  },
+      { name: "Blank Page", path: "/blank" },
+      { name: "404 Error", path: "/error-404" },
     ],
   },
   {
     name: "Avabar Banner",
     icon: <i className="fas fa-chess-queen text-lg"></i>,
     subItems: [
-      { name: "add avatar banner", path: "/add-avatar-banner",  },
-      { name: "avatar banner List", path: "/avatar-banner-list",  },
+      { name: "add avatar banner", path: "/add-avatar-banner" },
+      { name: "avatar banner List", path: "/avatar-banner-list" },
     ],
   },
 ];
@@ -90,50 +90,49 @@ const othersItems = [
     icon: <i className="fa fa-user-secret text-lg" aria-hidden="true"></i>,
     name: "Customer Users",
     subItems: [
-      { name: "Verify User", path: "/verify-users",  },
-      { name: "Generale User", path: "/generale-users",  },
-      { name: "Star User", path: "/star-users",  },
-      { name: "Block User", path: "/block-users",  },
-      
+      { name: "Verify User", path: "/verify-users" },
+      { name: "Generale User", path: "/generale-users" },
+      { name: "Star User", path: "/star-users" },
+      { name: "Block User", path: "/block-users" },
     ],
   },
   {
     icon: <i class="fa fa-cart-plus text-lg" aria-hidden="true"></i>,
     name: "Orders",
     subItems: [
-      { name: "Pending Orders", path: "/pending-order-list",  },
-      { name: "Completed Orders", path: "/completed-order-list",  },
-      { name: "Cancelled Orders", path: "/cancelled-order-list",  },
-      { name: "Delivered Orders", path: "/delivered-order-list",  },
-      { name: "Returned Orders", path: "/returned-order-list",  },
+      { name: "Pending Orders", path: "/pending-order-list" },
+      { name: "Completed Orders", path: "/completed-order-list" },
+      { name: "Cancelled Orders", path: "/cancelled-order-list" },
+      { name: "Delivered Orders", path: "/delivered-order-list" },
+      { name: "Returned Orders", path: "/returned-order-list" },
     ],
   },
   {
     icon: <PieChartIcon />,
     name: "Charts",
     subItems: [
-      { name: "Line Chart", path: "/line-chart",  },
-      { name: "Bar Chart", path: "/bar-chart",  },
+      { name: "Line Chart", path: "/line-chart" },
+      { name: "Bar Chart", path: "/bar-chart" },
     ],
   },
   {
     icon: <BoxCubeIcon />,
     name: "UI Elements",
     subItems: [
-      { name: "Alerts", path: "/alerts",  },
-      { name: "Avatar", path: "/avatars",  },
-      { name: "Badge", path: "/badge",  },
-      { name: "Buttons", path: "/buttons",  },
-      { name: "Images", path: "/images",  },
-      { name: "Videos", path: "/videos",  },
+      { name: "Alerts", path: "/alerts" },
+      { name: "Avatar", path: "/avatars" },
+      { name: "Badge", path: "/badge" },
+      { name: "Buttons", path: "/buttons" },
+      { name: "Images", path: "/images" },
+      { name: "Videos", path: "/videos" },
     ],
   },
   {
     icon: <PlugInIcon />,
     name: "Authentication",
     subItems: [
-      { name: "Sign In", path: "/signin",  },
-      { name: "Sign Up", path: "/signup",  },
+      { name: "Sign In", path: "/signin" },
+      { name: "Sign Up", path: "/signup" },
     ],
   },
 ];
@@ -346,22 +345,23 @@ const AppSidebar = () => {
       >
         <Link to="/">
           {isExpanded || isHovered || isMobileOpen ? (
-            <>
+            <div className="flex justify-center items-center gap-1">
               <img
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/logo-icon.svg"
                 alt="Logo"
-                width={150}
+                width={40}
                 height={40}
               />
               <img
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/images/logo/logo-icon.svg"
                 alt="Logo"
-                width={150}
+                width={40}
                 height={40}
               />
-            </>
+              <span className="dark:text-white text-3xl font-bold uppercase">Dashboard</span>
+            </div>
           ) : (
             <img
               src="/images/logo/logo-icon.svg"
