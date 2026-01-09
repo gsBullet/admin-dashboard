@@ -27,7 +27,7 @@ const ShowOrderModal = ({ isEditOpen, setIsEditOpen, orderInfo,orderStatus,order
     (total, product) => total + product.price * product.quantity,
     0
   );
-  console.log(customerInfo);
+  // console.log(customerInfo);
 
   return (
     <div>
