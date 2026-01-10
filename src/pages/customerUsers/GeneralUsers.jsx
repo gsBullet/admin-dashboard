@@ -21,6 +21,8 @@ const GeneralUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState([]);
 
+  const [selectUser, setSelectUser] = useState(null);
+
   // console.log(users);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -58,6 +60,7 @@ const GeneralUsers = () => {
   const handleShowCustomerData = (user) => {
     console.log(user);
     setIsOpen(true);
+    setSelectUser(user);
   };
   return (
     <div>
@@ -193,7 +196,11 @@ const GeneralUsers = () => {
             />
           </div>
         </div>
-        <CustomerProfile isOpen={isOpen} setIsOpen={setIsOpen} />
+        <CustomerProfile
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          selectUser={selectUser}
+        />
       </ComponentCard>
     </div>
   );

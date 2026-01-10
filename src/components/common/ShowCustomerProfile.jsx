@@ -16,9 +16,13 @@ import {
 } from "lucide-react";
 import { Modal } from "../ui/modal";
 
-export default function CustomerProfile({isOpen,setIsOpen}) {
+export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+
+  const customerInfo = selectUser || {};
+  console.log(customerInfo);
+  
 
   const [customer, setCustomer] = useState({
     name: "Alexandra Johnson",
@@ -164,7 +168,7 @@ export default function CustomerProfile({isOpen,setIsOpen}) {
             <div className="inline-flex items-center gap-3 mb-4 px-6 py-3 bg-white/5 backdrop-blur-md rounded-full border border-white/10">
               <Crown className="w-5 h-5 text-amber-400" />
               <span className="text-amber-400 font-semibold">
-                {customer.name}
+                {customerInfo.name}
               </span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-white mb-4">
@@ -183,8 +187,8 @@ export default function CustomerProfile({isOpen,setIsOpen}) {
                 <div className="relative w-40 h-40 mx-auto mb-6">
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 rounded-full animate-spin-slow blur-md"></div>
                   <img
-                    src={customer.image}
-                    alt={customer.name}
+                    src={customerInfo.avatar}
+                    alt={customerInfo.name}
                     className="relative w-full h-full rounded-full object-cover border-4 border-white/30 shadow-2xl"
                   />
                   {customer.verified && (
@@ -195,12 +199,12 @@ export default function CustomerProfile({isOpen,setIsOpen}) {
                 </div>
 
                 <h2 className="text-2xl font-bold text-white text-center mb-2">
-                  {customer.name}
+                  {customerInfo.name}
                 </h2>
                 <div className="flex items-center justify-center gap-2 mb-6">
                   <Award className="w-4 h-4 text-amber-400" />
                   <span className="text-amber-400 font-semibold">
-                    {customer.loyaltyStatus}
+                    {customerInfo.activeUserStatus}
                   </span>
                 </div>
 
@@ -283,7 +287,7 @@ export default function CustomerProfile({isOpen,setIsOpen}) {
                             />
                           ) : (
                             <p className="text-white font-medium break-all">
-                              {customer.email}
+                              {customerInfo.email}
                             </p>
                           )}
                         </div>
@@ -317,7 +321,7 @@ export default function CustomerProfile({isOpen,setIsOpen}) {
                             />
                           ) : (
                             <p className="text-white font-medium">
-                              {customer.phone}
+                              {customerInfo.phone}
                             </p>
                           )}
                         </div>
@@ -371,7 +375,7 @@ export default function CustomerProfile({isOpen,setIsOpen}) {
                             Member Since
                           </p>
                           <p className="text-white font-medium">
-                            {customer.memberSince}
+                            {customerInfo.createdAt.split("T")[0] || "N/A"}
                           </p>
                         </div>
                       </div>
@@ -391,7 +395,7 @@ export default function CustomerProfile({isOpen,setIsOpen}) {
                             Loyalty Status
                           </p>
                           <p className="text-white font-medium">
-                            {customer.loyaltyStatus}
+                            {customerInfo.activeUserStatus}
                           </p>
                         </div>
                       </div>
