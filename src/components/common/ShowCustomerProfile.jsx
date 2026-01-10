@@ -15,28 +15,15 @@ import {
   Star,
 } from "lucide-react";
 import { Modal } from "../ui/modal";
+import BdDateFormate from "./BdDateFormate";
 
-export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
-  const [isEditing, setIsEditing] = useState(false);
+export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
   const [activeTab, setActiveTab] = useState("all");
 
   const customerInfo = selectUser || {};
+  const customerAdress = customerInfo?.addresses?.[0] || {};
   console.log(customerInfo);
-  
 
-  const [customer, setCustomer] = useState({
-    name: "Alexandra Johnson",
-    email: "alex.johnson@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "742 Evergreen Terrace, Springfield, IL 62704",
-    totalOrders: 42,
-    verified: true,
-    totalSpent: 3542.75,
-    memberSince: "January 2021",
-    loyaltyStatus: "Gold Member",
-    image:
-      "https://picsum.photos/seed/customer123/200/200.jpg",
-  });
 
   const orders = [
     {
@@ -106,10 +93,6 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
       ? orders
       : orders.filter((order) => order.status === activeTab);
 
-  const handleSave = () => {
-    setIsEditing(false);
-  };
-
   const getStatusColor = (status) => {
     switch (status) {
       case "delivered":
@@ -128,14 +111,14 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
   const stats = [
     {
       label: "Total Orders",
-      value: customer.totalOrders,
+      value: 14,
       icon: ShoppingBag,
       color: "from-violet-500 to-purple-600",
       bgGlow: "bg-violet-500/20",
     },
     {
       label: "Total Spent",
-      value: `$${customer.totalSpent.toFixed(0)}`,
+      value: 4500,
       icon: TrendingUp,
       color: "from-emerald-500 to-teal-600",
       bgGlow: "bg-emerald-500/20",
@@ -185,13 +168,13 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
               <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 hover:scale-105">
                 {/* Profile Image */}
                 <div className="relative w-40 h-40 mx-auto mb-6">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 rounded-full animate-spin-slow blur-md"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-white rounded-full animate-spin-slow blur-md"></div>
                   <img
                     src={customerInfo.avatar}
                     alt={customerInfo.name}
                     className="relative w-full h-full rounded-full object-cover border-4 border-white/30 shadow-2xl"
                   />
-                  {customer.verified && (
+                  {customerInfo.isVerified && (
                     <div className="absolute bottom-2 right-2 bg-emerald-500 rounded-full p-2 border-4 border-slate-950 shadow-lg animate-bounce">
                       <CheckCircle className="w-6 h-6 text-white" />
                     </div>
@@ -204,7 +187,7 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
                 <div className="flex items-center justify-center gap-2 mb-6">
                   <Award className="w-4 h-4 text-amber-400" />
                   <span className="text-amber-400 font-semibold">
-                    {customerInfo.activeUserStatus}
+                    {customerInfo.activeUserStatus?.toUpperCase()}
                   </span>
                 </div>
 
@@ -219,7 +202,7 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
                         ></div>
                         <div className="relative bg-white/5 p-4 rounded-xl border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all text-center">
                           <Icon className="w-5 h-5 text-purple-400 mx-auto mb-2" />
-                          <div className="text-2xl font-bold text-white mb-1">
+                          <div className="text-xl font-bold text-white mb-1">
                             {stat.value}
                           </div>
                           <div className="text-xs text-purple-300">
@@ -230,23 +213,6 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
                     );
                   })}
                 </div>
-
-                <button
-                  onClick={() =>
-                    isEditing ? handleSave() : setIsEditing(true)
-                  }
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold py-4 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50 flex items-center justify-center gap-2"
-                >
-                  {isEditing ? (
-                    <>
-                      <Save className="w-5 h-5" /> Save Changes
-                    </>
-                  ) : (
-                    <>
-                      <Edit2 className="w-5 h-5" /> Edit Profile
-                    </>
-                  )}
-                </button>
               </div>
             </div>
 
@@ -273,23 +239,10 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
                           <p className="text-purple-300 text-sm mb-2">
                             Email Address
                           </p>
-                          {isEditing ? (
-                            <input
-                              type="email"
-                              value={customer.email}
-                              onChange={(e) =>
-                                setCustomer({
-                                  ...customer,
-                                  email: e.target.value,
-                                })
-                              }
-                              className="w-full bg-white/10 text-white px-4 py-2 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                          ) : (
-                            <p className="text-white font-medium break-all">
-                              {customerInfo.email}
-                            </p>
-                          )}
+
+                          <p className="text-white font-medium break-all">
+                            {customerInfo.email}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -307,23 +260,10 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
                           <p className="text-purple-300 text-sm mb-2">
                             Phone Number
                           </p>
-                          {isEditing ? (
-                            <input
-                              type="tel"
-                              value={customer.phone}
-                              onChange={(e) =>
-                                setCustomer({
-                                  ...customer,
-                                  phone: e.target.value,
-                                })
-                              }
-                              className="w-full bg-white/10 text-white px-4 py-2 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            />
-                          ) : (
-                            <p className="text-white font-medium">
-                              {customerInfo.phone}
-                            </p>
-                          )}
+
+                          <p className="text-white font-medium">
+                            {customerInfo.phone}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -341,22 +281,15 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
                           <p className="text-purple-300 text-sm mb-2">
                             Shipping Address
                           </p>
-                          {isEditing ? (
-                            <textarea
-                              value={customer.address}
-                              onChange={(e) =>
-                                setCustomer({
-                                  ...customer,
-                                  address: e.target.value,
-                                })
-                              }
-                              className="w-full bg-white/10 text-white px-4 py-2 rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500 h-20 resize-none"
-                            />
-                          ) : (
-                            <p className="text-white font-medium">
-                              {customer.address}
-                            </p>
-                          )}
+                          <p className="text-white font-medium">
+                            {customerAdress.address +
+                              ", " +
+                              customerAdress.city +
+                              ", " +
+                              customerAdress.state +
+                              ", " +
+                              customerAdress.country}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -375,7 +308,7 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
                             Member Since
                           </p>
                           <p className="text-white font-medium">
-                            {customerInfo.createdAt.split("T")[0] || "N/A"}
+                            {BdDateFormate(customerInfo.createdAt)}
                           </p>
                         </div>
                       </div>
@@ -395,7 +328,7 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
                             Loyalty Status
                           </p>
                           <p className="text-white font-medium">
-                            {customerInfo.activeUserStatus}
+                            {customerInfo.activeUserStatus?.toUpperCase()}
                           </p>
                         </div>
                       </div>
@@ -409,7 +342,7 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
           {/* Order History */}
           <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
             <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500  rounded-xl flex items-center justify-center">
                 <Package className="w-5 h-5 text-white" />
               </div>
               Order History
@@ -429,7 +362,7 @@ export default function CustomerProfile({isOpen,setIsOpen,selectUser}) {
                   onClick={() => setActiveTab(tab.key)}
                   className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                     activeTab === tab.key
-                      ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30"
+                      ? "bg-gradient-to-r from-blue-500 to-cyan-500  text-white shadow-lg shadow-purple-500/30"
                       : "text-purple-300 hover:bg-white/10"
                   }`}
                 >
