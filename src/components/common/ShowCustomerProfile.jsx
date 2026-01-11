@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Mail,
   Phone,
@@ -13,92 +13,84 @@ import {
   Award,
   Crown,
   Star,
+  Loader,
 } from "lucide-react";
 import { Modal } from "../ui/modal";
 import BdDateFormate from "./BdDateFormate";
+import { getAllPaymentOrdersByUser } from "../../service/generalUsers";
+import { AuthContext } from "../../context/AuthContext";
+import bdTimeFormat from "./bdTimeFormat";
+import TablePagination from "../../pages/Tables/TablePagination";
 
 export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
+  const { auth } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("all");
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [totalOrders, setTotalOrders] = useState(0);
+
+  const [statusCount, setStatusCount] = useState({
+    pending: 0,
+    processing: 0,
+    shipped: 0,
+    delivered: 0,
+    cancelled: 0,
+  });
 
   const customerInfo = selectUser || {};
   const customerAdress = customerInfo?.addresses?.[0] || {};
-  console.log(customerInfo);
+  // console.log(currentPage);
+  useEffect(() => {
+    if (!customerInfo?._id) return;
+    const fetchOrders = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getAllPaymentOrdersByUser({
+          token: auth.token,
+          userId: customerInfo?._id,
+          limit,
+          currentPage,
+          searchTerm,
+          activeTab,
+        });
 
+        if (response?.success) {
+          setOrders(response.data.orders);
+          setTotalOrders(response.data.totalItems);
+          setCurrentPage(response.data.currentPage);
+          setTotalPages(response.data.totalPages);
+           setStatusCount(response.data.statusCount);
+          console.log(currentPage);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const orders = [
-    {
-      id: "ORD-2023-089",
-      product: "Premium Cotton T-Shirt",
-      description: "Black, Size L, 100% Cotton",
-      price: "129.99",
-      date: "Jan 15, 2026",
-      status: "delivered",
-      image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop",
-    },
-    {
-      id: "ORD-2023-088",
-      product: "Denim Jacket",
-      description: "Blue, Size M, Classic Fit",
-      price: "249.99",
-      date: "Jan 10, 2026",
-      status: "delivered",
-      image:
-        "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=200&h=200&fit=crop",
-    },
-    {
-      id: "ORD-2023-087",
-      product: "Summer Dress",
-      description: "Floral Print, Size S",
-      price: "89.99",
-      date: "Jan 05, 2026",
-      status: "processing",
-      image:
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=200&h=200&fit=crop",
-    },
-    {
-      id: "ORD-2023-086",
-      product: "Wool Sweater",
-      description: "Gray, Size M, Merino",
-      price: "79.99",
-      date: "Dec 28, 2025",
-      status: "processing",
-      image:
-        "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=200&h=200&fit=crop",
-    },
-    {
-      id: "ORD-2023-085",
-      product: "Cargo Pants",
-      description: "Khaki, Size 32",
-      price: "64.99",
-      date: "Dec 20, 2025",
-      status: "cancelled",
-      image:
-        "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=200&h=200&fit=crop",
-    },
-    {
-      id: "ORD-2023-084",
-      product: "Leather Boots",
-      description: "Brown, Size 10",
-      price: "159.99",
-      date: "Dec 15, 2025",
-      status: "returned",
-      image:
-        "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=200&h=200&fit=crop",
-    },
-  ];
-
-  const filteredOrders =
-    activeTab === "all"
-      ? orders
-      : orders.filter((order) => order.status === activeTab);
+    fetchOrders();
+  }, [
+    customerInfo?._id,
+    auth?.token,
+    currentPage,
+    limit,
+    searchTerm,
+    activeTab,
+  ]);
 
   const getStatusColor = (status) => {
     switch (status) {
       case "delivered":
         return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
-      case "processing":
+      case "pending":
         return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+      case "confirmed":
+        return "bg-cyan-500/20 text-cyan-400 border-cyan-500/30";
       case "cancelled":
         return "bg-red-500/20 text-red-400 border-red-500/30";
       case "returned":
@@ -131,6 +123,15 @@ export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
       bgGlow: "bg-blue-500/20",
     },
   ];
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (limit) => {
+    setLimit(limit);
+    setCurrentPage(1);
+  };
 
   return (
     <Modal
@@ -351,11 +352,27 @@ export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
             {/* Tabs */}
             <div className="flex flex-wrap gap-3 mb-8 p-2 bg-white/5 rounded-2xl border border-white/10">
               {[
-                { key: "all", label: `All Orders (${orders.length})` },
-                { key: "delivered", label: "Delivered" },
-                { key: "processing", label: "Processing" },
-                { key: "cancelled", label: "Cancelled" },
-                { key: "returned", label: "Returned" },
+                { key: "all", label: `All Orders (${statusCount.all || 0})` },
+                {
+                  key: "pending",
+                  label: `Pending (${statusCount.pending || 0})`,
+                },
+                {
+                  key: "confirmed",
+                  label: `Confirmed (${statusCount.confirmed || 0})`,
+                },
+                {
+                  key: "delivered",
+                  label: `Delivered (${statusCount.delivered || 0})`,
+                },
+                {
+                  key: "cancelled",
+                  label: `Cancelled (${statusCount.cancelled || 0})`,
+                },
+                {
+                  key: "returned",
+                  label: `Returned (${statusCount.returned || 0})`,
+                },
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -371,65 +388,144 @@ export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
               ))}
             </div>
 
-            {/* Orders List */}
-            <div className="space-y-4">
-              {filteredOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="group relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-all blur-xl"></div>
-
-                  <div className="relative flex flex-col md:flex-row md:items-center gap-6 justify-between">
-                    <div className="flex items-center gap-6 flex-1">
-                      <div className="relative">
-                        <div className="w-24 h-24 rounded-xl overflow-hidden bg-white/10 shadow-lg">
-                          <img
-                            src={order.image}
-                            alt={order.product}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex-1">
-                        <h4 className="text-white font-bold text-xl mb-2">
-                          {order.product}
-                        </h4>
-                        <p className="text-purple-300 text-sm mb-3">
-                          {order.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm">
-                          <span className="text-purple-400 font-medium">
-                            {order.id}
-                          </span>
-                          <span className="text-purple-500">•</span>
-                          <span className="text-purple-400">{order.date}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
-                        <p className="text-purple-300 text-sm mb-1">Price</p>
-                        <p className="text-white font-bold text-3xl">
-                          ${order.price}
-                        </p>
-                      </div>
-                      <div>
-                        <span
-                          className={`px-5 py-2 rounded-full text-sm font-semibold border ${getStatusColor(
-                            order.status
-                          )} capitalize`}
-                        >
-                          {order.status}
-                        </span>
-                      </div>
-                    </div>
+            {/* Modern Table */}
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <Loader />
+              </div>
+            ) : (
+              <>
+                <div className="overflow-hidden rounded-2xl border border-white/10">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 backdrop-blur-sm border-b border-white/10">
+                          <th className="px-6 py-4 text-left text-xs font-bold text-purple-300 uppercase tracking-wider">
+                            Serial
+                          </th>{" "}
+                          <th className="px-6 py-4 text-left text-xs font-bold text-purple-300 uppercase tracking-wider">
+                            Transaction ID
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-bold text-purple-300 uppercase tracking-wider">
+                            Total Amount
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-bold text-purple-300 uppercase tracking-wider">
+                            Items
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-bold text-purple-300 uppercase tracking-wider">
+                            Payment
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-bold text-purple-300 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-bold text-purple-300 uppercase tracking-wider">
+                            Order Date
+                          </th>
+                          <th className="px-6 py-4 text-left text-xs font-bold text-purple-300 uppercase tracking-wider">
+                            Execute Date
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {orders.map((order, idx) => (
+                          <tr
+                            key={order._id}
+                            className="group hover:bg-white/5 transition-all duration-300 animate-fade-in"
+                            style={{ animationDelay: `${idx * 0.05}s` }}
+                          >
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <span className="text-white font-mono text-sm font-medium">
+                                {(currentPage - 1) * limit + idx + 1}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity">
+                                  <Package className="w-4 h-4 text-white" />
+                                </div>
+                                <span className="text-white font-mono text-sm font-medium">
+                                  {order.trxId}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <span className="text-emerald-400 font-bold text-lg">
+                                ৳{order.totalAmount}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center border border-purple-500/30">
+                                  <span className="text-purple-300 font-bold text-sm">
+                                    {order.quantity}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <span className="px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-lg text-purple-200 text-sm font-medium border border-white/20">
+                                {order.paymentMethod}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <span
+                                className={`px-4 py-2 rounded-xl text-sm font-bold border backdrop-blur-sm ${getStatusColor(
+                                  order.status
+                                )} shadow-lg`}
+                              >
+                                {order.status.charAt(0).toUpperCase() +
+                                  order.status.slice(1)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <div className="flex items-center justify-center gap-2 text-purple-300 flex-wrap">
+                                <Calendar className="w-4 h-4" />
+                                <span className="text-sm font-medium">
+                                  {bdTimeFormat(order.createdAt)}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-5 whitespace-nowrap">
+                              <div className="flex items-center justify-center  gap-2 text-purple-300 flex-wrap">
+                                <Calendar className="w-4 h-4" />
+                                <span className="text-sm font-medium ">
+                                  {bdTimeFormat(order.updatedAt)}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
+
+                  {/* Empty State */}
+                  {orders?.length === 0 && (
+                    <div className="py-16 text-center">
+                      <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Package className="w-10 h-10 text-purple-400" />
+                      </div>
+                      <p className="text-purple-300 text-lg font-medium">
+                        No orders found
+                      </p>
+                      <p className="text-purple-400 text-sm mt-2">
+                        Try adjusting your filters
+                      </p>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+                <div>
+                  <TablePagination
+                    totalItems={totalOrders}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    pageSize={limit}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
 

@@ -196,11 +196,13 @@ const GeneralUsers = () => {
             />
           </div>
         </div>
-        <CustomerProfile
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
-          selectUser={selectUser}
-        />
+        {isOpen && (
+          <CustomerProfile
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            selectUser={selectUser}
+          />
+        )}
       </ComponentCard>
     </div>
   );
