@@ -23,7 +23,7 @@ const navItems = [
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/",
-    // subItems: [{ name: "Ecommerce", path: "/",  }],
+    subItems: [{ name: "Ecommerce", path: "/",  }],
   },
   {
     icon: <i className="fas fa-snowflake text-lg"></i>,
@@ -90,8 +90,8 @@ const othersItems = [
     icon: <i className="fa fa-user-secret text-lg" aria-hidden="true"></i>,
     name: "Customer Users",
     subItems: [
-      { name: "Verify User", path: "/verify-users" },
       { name: "Generale User", path: "/generale-users" },
+      { name: "Verify User", path: "/verify-users" },
       { name: "Star User", path: "/star-users" },
       { name: "Block User", path: "/block-users" },
     ],
@@ -102,9 +102,9 @@ const othersItems = [
     subItems: [
       { name: "Pending Orders", path: "/pending-order-list" },
       { name: "Completed Orders", path: "/completed-order-list" },
-      { name: "Cancelled Orders", path: "/cancelled-order-list" },
       { name: "Delivered Orders", path: "/delivered-order-list" },
       { name: "Returned Orders", path: "/returned-order-list" },
+      { name: "Cancelled Orders", path: "/cancelled-order-list" },
     ],
   },
   {
