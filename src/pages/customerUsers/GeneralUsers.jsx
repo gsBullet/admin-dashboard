@@ -11,6 +11,7 @@ import Badge from "../../components/ui/badge/Badge";
 import TablePagination from "../Tables/TablePagination";
 import Button from "../../components/ui/button/Button";
 import CustomerProfile from "../../components/common/ShowCustomerProfile";
+import Swal from "sweetalert2";
 
 const GeneralUsers = () => {
   const { auth } = useContext(AuthContext);
@@ -58,10 +59,57 @@ const GeneralUsers = () => {
     setSearchTerm("");
   };
   const handleShowCustomerData = (user) => {
-    console.log(user);
+    // console.log(user);
     setIsOpen(true);
     setSelectUser(user);
   };
+  const handleChangeCustomerStatus=async()=>{
+
+const result = await Swal.fire({
+      title: "Are you sure?",
+      icon: "question",
+
+      showCloseButton: true, // ❌ close icon
+      closeButtonAriaLabel: "Close",
+
+      showDenyButton: true,
+      showCancelButton: false,
+
+      confirmButtonText: "Verify User",
+      denyButtonText: "Star User",
+
+      confirmButtonColor: "#16a34a",
+      denyButtonColor: "#dc2626",
+
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    // ✅ CONFIRM
+    if (result.isConfirmed) {
+      // await completedOrdersFromPending(orderId, auth.token);
+      // setPenOrders((prevOrders) =>
+      //   prevOrders.filter((order) => order._id !== orderId)
+      // );
+      // SweetAlert({
+      //   type: "toast",
+      //   icon: "success",
+      //   title: "Order Confirmed Successfully",
+      // });
+      console.log("Confirmed");
+    }
+
+    // ❌ DENY (Cancel Order)
+    else if (result.isDenied) {
+      // await cancelOrdersByAdmin(orderId, auth.token);
+      // SweetAlert({
+      //   type: "toast",
+      //   icon: "warning",
+      //   title: "Order Cancelled Successfully",
+      // });
+      console.log("Denied");
+    }
+  }
   return (
     <div>
       <PageMeta
@@ -167,11 +215,15 @@ const GeneralUsers = () => {
                       </button>
                     </div>
                     <div>
-                      <i
-                        class="fa fa-edit text-xl"
-                        aria-hidden="true"
-                        title="edit data"
-                      ></i>
+                      <button
+                      onClick={() =>handleChangeCustomerStatus(user._id)}
+                      >
+                        <i
+                          class="fas fa-bolt text-xl px-1"
+                          aria-hidden="true"
+                          title="Change Type"
+                        ></i>
+                      </button>
                     </div>
                     <div>
                       <i
