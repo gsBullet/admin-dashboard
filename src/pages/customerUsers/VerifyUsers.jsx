@@ -92,7 +92,7 @@ const VerifyUsers = () => {
             </div>
           </div>
           <table className="min-w-full divide-y text-gray-800 dark:text-white/90">
-            <thead className="bg-gray-50 dark:bg-gray-800">
+            <thead className="bg-gray-300 dark:bg-gray-800">
               <tr>
                 <th
                   scope="col"
@@ -133,10 +133,11 @@ const VerifyUsers = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y dark:bg-gray-900">
-              {users?.map((user, index) => (
+              {users
+              .map((user, index) => (
                 <tr
                   key={index}
-                  className={`${user.totalPayment > 5 ? "bg-indigo-500" : ""}`}
+                  className={`${user.totalPayment > 5 ? "bg-cyan-700 hover:bg-cyan-800" : "hover:bg-gray-200 dark:hover:bg-gray-800"}`}
                 >
                   <td className=" py-4 whitespace-nowrap">{user.name}</td>
                   <td className=" py-4 whitespace-nowrap">{user.email}</td>

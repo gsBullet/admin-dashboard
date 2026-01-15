@@ -82,3 +82,14 @@ export const getAllPaymentOrdersByUser = async ({
   );
   return response.data;
 };
+export const changeGeneralUserStatusByPending = async ({ token, userId,status,isVerified }) => {
+  const response = await Axios.get(
+    `/general-users/change-general-user-status-by-pending/${userId}/${status}/${isVerified}`,
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    }
+  );
+  return response.data;
+};

@@ -5,13 +5,17 @@ import ComponentCard from "../../components/common/ComponentCard";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useEffect } from "react";
-import { getAllGeneralUsers } from "../../service/generalUsers";
+import {
+  changeGeneralUserStatusByPending,
+  getAllGeneralUsers,
+} from "../../service/generalUsers";
 import { useState } from "react";
 import Badge from "../../components/ui/badge/Badge";
 import TablePagination from "../Tables/TablePagination";
 import Button from "../../components/ui/button/Button";
 import CustomerProfile from "../../components/common/ShowCustomerProfile";
 import Swal from "sweetalert2";
+import SweetAlert from "../../components/common/SweetAlert";
 
 const GeneralUsers = () => {
   const { auth } = useContext(AuthContext);
@@ -63,9 +67,8 @@ const GeneralUsers = () => {
     setIsOpen(true);
     setSelectUser(user);
   };
-  const handleChangeCustomerStatus=async()=>{
-
-const result = await Swal.fire({
+  const handleChangeCustomerStatus = async (userId) => {
+    const result = await Swal.fire({
       title: "Are you sure?",
       icon: "question",
 
@@ -87,16 +90,18 @@ const result = await Swal.fire({
 
     // ✅ CONFIRM
     if (result.isConfirmed) {
-      // await completedOrdersFromPending(orderId, auth.token);
-      // setPenOrders((prevOrders) =>
-      //   prevOrders.filter((order) => order._id !== orderId)
-      // );
-      // SweetAlert({
-      //   type: "toast",
-      //   icon: "success",
-      //   title: "Order Confirmed Successfully",
-      // });
-      console.log("Confirmed");
+      await changeGeneralUserStatusByPending({
+        userId,
+        token: auth.token,
+        status: "verified",
+        isVerified: true,
+      });
+      setUsers((preUsers) => preUsers.filter((user) => user._id !== userId));
+      SweetAlert({
+        type: "toast",
+        icon: "success",
+        title: "Verified User Successfully",
+      });
     }
 
     // ❌ DENY (Cancel Order)
@@ -109,7 +114,7 @@ const result = await Swal.fire({
       // });
       console.log("Denied");
     }
-  }
+  };
   return (
     <div>
       <PageMeta
@@ -140,7 +145,7 @@ const result = await Swal.fire({
             </div>
           </div>
           <table className="min-w-full divide-y text-gray-800 dark:text-white/90">
-            <thead className="bg-gray-50 dark:bg-gray-800">
+            <thead className="bg-gray-300 dark:bg-gray-800">
               <tr>
                 <th
                   scope="col"
@@ -184,7 +189,7 @@ const result = await Swal.fire({
               {users?.map((user, index) => (
                 <tr
                   key={index}
-                  className={`${user.totalPayment > 5 ? "bg-indigo-500" : ""}`}
+                  className={`${user.totalPayment > 5 ? "bg-indigo-500" : "hover:bg-gray-100 dark:hover:bg-gray-600"}`}
                 >
                   <td className=" py-4 whitespace-nowrap">{user.name}</td>
                   <td className=" py-4 whitespace-nowrap">{user.email}</td>
@@ -206,7 +211,10 @@ const result = await Swal.fire({
                   </td>
                   <td className=" py-4 flex gap-2 justify-center items-center whitespace-nowrap">
                     <div>
-                      <button onClick={() => handleShowCustomerData(user)}>
+                      <button
+                        onClick={() => handleShowCustomerData(user)}
+                        className="hover:text-green-500"
+                      >
                         <i
                           class="fa fa-eye text-xl"
                           aria-hidden="true"
@@ -216,7 +224,8 @@ const result = await Swal.fire({
                     </div>
                     <div>
                       <button
-                      onClick={() =>handleChangeCustomerStatus(user._id)}
+                        onClick={() => handleChangeCustomerStatus(user._id)}
+                        className="hover:text-blue-700"
                       >
                         <i
                           class="fas fa-bolt text-xl px-1"
@@ -226,11 +235,15 @@ const result = await Swal.fire({
                       </button>
                     </div>
                     <div>
-                      <i
-                        class="fa fa-trash text-xl"
-                        aria-hidden="true"
-                        title="delete data"
-                      ></i>
+                      <button
+                      className="hover:text-red-700"
+                      >
+                        <i
+                          class="fa fa-trash text-xl"
+                          aria-hidden="true"
+                          title="delete data"
+                        ></i>
+                      </button>
                     </div>
                   </td>
                 </tr>

@@ -5,15 +5,13 @@ import {
   MapPin,
   Package,
   CheckCircle,
-  Edit2,
-  Save,
   ShoppingBag,
   Calendar,
   TrendingUp,
-  Award,
   Crown,
   Star,
   Loader,
+  IdCard,
 } from "lucide-react";
 import { Modal } from "../ui/modal";
 import BdDateFormate from "./BdDateFormate";
@@ -32,6 +30,7 @@ export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [totalOrders, setTotalOrders] = useState(0);
+  const [showIdCard, setShowIdCard] = useState(false);
 
   const [statusCount, setStatusCount] = useState({
     pending: 0,
@@ -63,8 +62,8 @@ export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
           setTotalOrders(response.data.totalItems);
           setCurrentPage(response.data.currentPage);
           setTotalPages(response.data.totalPages);
-           setStatusCount(response.data.statusCount);
-          console.log(currentPage);
+          setStatusCount(response.data.statusCount);
+          // console.log(currentPage);
         }
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -152,11 +151,11 @@ export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
             <div className="inline-flex items-center gap-3 mb-4 px-6 py-3 bg-white/5 backdrop-blur-md rounded-full border border-white/10">
               <Crown className="w-5 h-5 text-amber-400" />
               <span className="text-amber-400 font-semibold">
-                {customerInfo.name}
+                {customerInfo.activeUserStatus?.toUpperCase()}
               </span>
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-white mb-4">
-              Customer Profile
+              {customerInfo.name} Profile
             </h1>
             <p className="text-purple-300 text-lg">
               Complete customer management and analytics
@@ -186,10 +185,14 @@ export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
                   {customerInfo.name}
                 </h2>
                 <div className="flex items-center justify-center gap-2 mb-6">
-                  <Award className="w-4 h-4 text-amber-400" />
-                  <span className="text-amber-400 font-semibold">
-                    {customerInfo.activeUserStatus?.toUpperCase()}
-                  </span>
+                  <button
+                    onMouseEnter={() => setShowIdCard(true)}
+                    onMouseLeave={() => setShowIdCard(false)}
+                    className="flex justify-center items-center"
+                  >
+                    <IdCard className="w-6 h-6 text-amber-400" />
+                    <span className="text-white/90 font-bold">{" NID"}</span>
+                  </button>
                 </div>
 
                 {/* Stats Grid */}
@@ -219,124 +222,134 @@ export default function CustomerProfile({ isOpen, setIsOpen, selectUser }) {
 
             {/* Right Column - Contact Info */}
             <div className="lg:col-span-2">
-              <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl h-full">
-                <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-white" />
-                  </div>
-                  Contact Information
-                </h3>
+              {showIdCard && customerInfo?.nid ? (
+                <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl h-full">
+                  <img
+                    src={customerInfo.nid}
+                    alt={customerInfo?.name || "ID Card"}
+                    className="max-h-[350px] w-full rounded-md object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl h-full">
+                  <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-white" />
+                    </div>
+                    Contact Information
+                  </h3>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Email */}
-                  <div className="group relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
-                    <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                          <Mail className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-purple-300 text-sm mb-2">
-                            Email Address
-                          </p>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Email */}
+                    <div className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
+                      <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                            <Mail className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-purple-300 text-sm mb-2">
+                              Email Address
+                            </p>
 
-                          <p className="text-white font-medium break-all">
-                            {customerInfo.email}
-                          </p>
+                            <p className="text-white font-medium break-all">
+                              {customerInfo.email}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Phone */}
-                  <div className="group relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
-                    <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                          <Phone className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-purple-300 text-sm mb-2">
-                            Phone Number
-                          </p>
+                    {/* Phone */}
+                    <div className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
+                      <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                            <Phone className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-purple-300 text-sm mb-2">
+                              Phone Number
+                            </p>
 
-                          <p className="text-white font-medium">
-                            {customerInfo.phone}
-                          </p>
+                            <p className="text-white font-medium">
+                              {customerInfo.phone}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Address */}
-                  <div className="md:col-span-2 group relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-rose-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
-                    <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                          <MapPin className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-purple-300 text-sm mb-2">
-                            Shipping Address
-                          </p>
-                          <p className="text-white font-medium">
-                            {customerAdress.address +
-                              ", " +
-                              customerAdress.city +
-                              ", " +
-                              customerAdress.state +
-                              ", " +
-                              customerAdress.country}
-                          </p>
+                    {/* Address */}
+                    <div className="md:col-span-2 group relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-rose-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
+                      <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-rose-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                            <MapPin className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-purple-300 text-sm mb-2">
+                              Shipping Address
+                            </p>
+                            <p className="text-white font-medium">
+                              {customerAdress.address +
+                                ", " +
+                                customerAdress.city +
+                                ", " +
+                                customerAdress.state +
+                                ", " +
+                                customerAdress.country}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Member Since */}
-                  <div className="group relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
-                    <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                          <Calendar className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-purple-300 text-sm mb-2">
-                            Member Since
-                          </p>
-                          <p className="text-white font-medium">
-                            {BdDateFormate(customerInfo.createdAt)}
-                          </p>
+                    {/* Member Since */}
+                    <div className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-violet-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
+                      <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                            <Calendar className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-purple-300 text-sm mb-2">
+                              Member Since
+                            </p>
+                            <p className="text-white font-medium">
+                              {BdDateFormate(customerInfo.createdAt)}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Loyalty Status */}
-                  <div className="group relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
-                    <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                          <Star className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-purple-300 text-sm mb-2">
-                            Loyalty Status
-                          </p>
-                          <p className="text-white font-medium">
-                            {customerInfo.activeUserStatus?.toUpperCase()}
-                          </p>
+                    {/* Loyalty Status */}
+                    <div className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all"></div>
+                      <div className="relative bg-white/5 p-6 rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                            <Star className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-purple-300 text-sm mb-2">
+                              Loyalty Status
+                            </p>
+                            <p className="text-white font-medium">
+                              {customerInfo.activeUserStatus?.toUpperCase()}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
