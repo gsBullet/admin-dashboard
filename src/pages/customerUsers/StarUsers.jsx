@@ -5,15 +5,18 @@ import ComponentCard from "../../components/common/ComponentCard";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { useEffect } from "react";
-import {  getAllStarUsers } from "../../service/generalUsers";
+import { changeGeneralUserStatusByPending, getAllStarUsers } from "../../service/generalUsers";
 import { useState } from "react";
 import Badge from "../../components/ui/badge/Badge";
 import TablePagination from "../Tables/TablePagination";
 import Button from "../../components/ui/button/Button";
 import CustomerProfile from "../../components/common/ShowCustomerProfile";
+import { Loader } from "lucide-react";
+import Swal from "sweetalert2";
+import SweetAlert from "../../components/common/SweetAlert";
 
 const StarUsers = () => {
- const { auth } = useContext(AuthContext);
+  const { auth } = useContext(AuthContext);
   const [limit, setLimit] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -62,6 +65,60 @@ const StarUsers = () => {
     setIsOpen(true);
     setSelectUser(user);
   };
+
+  const handleChangeCustomerStatus = async (userId) => {
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        icon: "question",
+  
+        showCloseButton: true, // ❌ close icon
+        closeButtonAriaLabel: "Close",
+  
+        showDenyButton: true,
+        showCancelButton: false,
+  
+        confirmButtonText: "Verified User",
+        denyButtonText: "Block User",
+  
+        confirmButtonColor: "#16a34a",
+        denyButtonColor: "#dc2626",
+  
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+  
+      // ✅ CONFIRM
+      if (result.isConfirmed) {
+        await changeGeneralUserStatusByPending({
+          userId,
+          token: auth.token,
+          status: "verified",
+          isVerified: true,
+        });
+        setUsers((preUsers) => preUsers.filter((user) => user._id !== userId));
+        SweetAlert({
+          type: "toast",
+          icon: "success",
+          title: "Change User Status Successfully",
+        });
+      }
+  
+      // ❌ DENY (Cancel Order)
+      else if (result.isDenied) {
+        await changeGeneralUserStatusByPending({
+          userId,
+          token: auth.token,
+          status: "blocked",
+          isVerified: false,
+        });
+        setUsers((preUsers) => preUsers.filter((user) => user._id !== userId));
+        SweetAlert({
+          type: "toast",
+          icon: "success",
+          title: "Blocked User Successfully",
+        });
+      }
+    };
   return (
     <div>
       <PageMeta
@@ -91,100 +148,121 @@ const StarUsers = () => {
               </Button>
             </div>
           </div>
-          <table className="min-w-full divide-y text-gray-800 dark:text-white/90">
-            <thead className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
-                >
-                  Name
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
-                >
-                  Email
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
-                >
-                  Phone
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
-                >
-                  Total Orders
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
-                >
-                  Status
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
-                >
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y dark:bg-gray-900">
-              {users?.map((user, index) => (
-                <tr
-                  key={index}
-                  className={`${user.totalPayment > 5 ? "bg-indigo-500" : ""}`}
-                >
-                  <td className=" py-4 whitespace-nowrap">{user.name}</td>
-                  <td className=" py-4 whitespace-nowrap">{user.email}</td>
-                  <td className=" py-4 whitespace-nowrap">{user.phone}</td>
-                  <td className=" py-4 whitespace-nowrap">
-                    {user.totalPayment}
-                  </td>
-                  <td className=" py-4 whitespace-nowrap">
-                    <Badge
-                      size="sm"
-                      color={
-                        user.isVerified || user.totalPayment > 5
-                          ? "success"
-                          : "error"
-                      }
-                    >
-                      {user.isVerified ? "Verified" : "Not Verified"}
-                    </Badge>
-                  </td>
-                  <td className=" py-4 flex gap-2 justify-center items-center whitespace-nowrap">
-                    <div>
-                      <button onClick={() => handleShowCustomerData(user)}>
-                        <i
-                          class="fa fa-eye text-xl"
-                          aria-hidden="true"
-                          title="show data"
-                        ></i>
-                      </button>
-                    </div>
-                    <div>
-                      <i
-                        class="fa fa-edit text-xl"
-                        aria-hidden="true"
-                        title="edit data"
-                      ></i>
-                    </div>
-                    <div>
-                      <i
-                        class="fa fa-trash text-xl"
-                        aria-hidden="true"
-                        title="delete data"
-                      ></i>
-                    </div>
-                  </td>
+          {users?.length === 0 ? (
+            <div className="flex justify-center items-center">
+              <Loader
+                className="animate-spin text-gray-dark dark:text-success-500"
+                size={40}
+              />
+            </div>
+          ) : (
+            <table className="min-w-full divide-y text-gray-800 dark:text-white/90">
+              <thead className="bg-gray-50 dark:bg-gray-800">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
+                  >
+                    Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
+                  >
+                    Email
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
+                  >
+                    Phone
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
+                  >
+                    Total Orders
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3  text-xs font-semibold uppercase tracking-wider"
+                  >
+                    Action
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y dark:bg-gray-900">
+                {users?.map((user, index) => (
+                  <tr
+                    key={index}
+                    className={`${
+                      user.totalPayment > 5 ? "bg-indigo-500" : ""
+                    }`}
+                  >
+                    <td className=" py-4 whitespace-nowrap">{user.name}</td>
+                    <td className=" py-4 whitespace-nowrap">{user.email}</td>
+                    <td className=" py-4 whitespace-nowrap">{user.phone}</td>
+                    <td className=" py-4 whitespace-nowrap">
+                      {user.totalPayment}
+                    </td>
+                    <td className=" py-4 whitespace-nowrap">
+                      <Badge
+                        size="sm"
+                        color={
+                          user.isVerified || user.totalPayment > 5
+                            ? "success"
+                            : "error"
+                        }
+                      >
+                        {user.isVerified ? "Verified" : "Not Verified"}
+                      </Badge>
+                    </td>
+                    <td className=" py-4 flex gap-2 justify-center items-center whitespace-nowrap">
+                      <div>
+                        <button
+                          className="hover:text-success-700"
+                          onClick={() => handleShowCustomerData(user)}
+                        >
+                          <i
+                            class="fa fa-eye text-xl"
+                            aria-hidden="true"
+                            title="show data"
+                          ></i>
+                        </button>
+                      </div>
+                      <div>
+                        <button
+                          onClick={() => handleChangeCustomerStatus(user._id)}
+                          className="hover:text-blue-700"
+                        >
+                          <i
+                            class="fas fa-bolt text-xl px-1"
+                            aria-hidden="true"
+                            title="Change Type"
+                          ></i>
+                        </button>
+                      </div>
+                      <div>
+                        <button className="hover:text-red-700">
+                          <i
+                            class="fa fa-trash text-xl"
+                            aria-hidden="true"
+                            title="delete data"
+                          ></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
           <div>
             <TablePagination
               totalItems={totalUsers}
@@ -208,4 +286,4 @@ const StarUsers = () => {
   );
 };
 
-export default StarUsers
+export default StarUsers;
