@@ -23,7 +23,7 @@ const navItems = [
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/",
-    subItems: [{ name: "Ecommerce", path: "/",  }],
+    subItems: [{ name: "Ecommerce", path: "/" }],
   },
   {
     icon: <i className="fas fa-snowflake text-lg"></i>,
@@ -73,6 +73,14 @@ const navItems = [
     subItems: [
       { name: "Blank Page", path: "/blank" },
       { name: "404 Error", path: "/error-404" },
+    ],
+  },
+  {
+    name: "Promo Code",
+    icon: <i className="fa fa-tags text-lg" aria-hidden="true"></i>,
+    subItems: [
+      { name: "Add Promo Code", path: "/add-promo-code" },
+      { name: "List of Promo Code", path: "/promo-code-list" },
     ],
   },
   {
@@ -360,7 +368,9 @@ const AppSidebar = () => {
                 width={40}
                 height={40}
               />
-              <span className="dark:text-white text-3xl font-bold uppercase">Dashboard</span>
+              <span className="dark:text-white text-3xl font-bold uppercase">
+                Dashboard
+              </span>
             </div>
           ) : (
             <img

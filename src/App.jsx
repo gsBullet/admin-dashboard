@@ -39,6 +39,8 @@ import BlockUser from "./pages/customerUsers/BlockUser";
 import VerifyUsers from "./pages/customerUsers/VerifyUsers";
 import StarUsers from "./pages/customerUsers/StarUsers";
 import GeneralUsers from "./pages/customerUsers/GeneralUsers";
+import AddPromoCode from "./pages/PromoCode/AddPromoCode";
+import PromoCodeList from "./pages/PromoCode/PromoCodeList";
 
 export default function App() {
   const { auth } = useContext(AuthContext);
@@ -107,6 +109,10 @@ export default function App() {
               <Route path="/verify-users" element={<VerifyUsers />} />
               <Route path="/star-users" element={<StarUsers />} />
               <Route path="/generale-users" element={<GeneralUsers />} />
+
+              {/* promo code management  */}
+              <Route path="/add-promo-code" element={<AddPromoCode />} />
+              <Route path="/promo-code-list" element={<PromoCodeList />} />
 
               {/* Ui Elements */}
               {/* <Route path="/alerts" element={<Alerts />} />

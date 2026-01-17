@@ -237,7 +237,7 @@ const ListCategory = () => {
                     categories.map((cat) => (
                       <TableRow
                         key={cat._id}
-                        className="text-center hover:bg-gray-100 dark:hover:bg-white/03"
+                        className="text-center hover:bg-gray-100 dark:hover:bg-white/5"
                       >
                         <TableCell className="px-4 py-3 text-gray-500   dark:text-gray-400">
                           {cat.name}

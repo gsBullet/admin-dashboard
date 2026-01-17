@@ -21,25 +21,7 @@ export const addCategory = async (data) => {
   }
 };
 
-// export const getAllCategory = async ({ page, limit }) => {
-//   try {
-//     const response = await Axios.get(
-//       `/category/all-category?page=${page}&limit=${limit}`,
-//       {
-//         headers: {
-//           authorization: `EcomToken ${token}`,
-//         },
-//       }
-//     );
-//     if (response.data.data) {
-//       return response.data.data;
-//     } else {
-//       return [];
-//     }
-//   } catch (error) {
-//     return error;
-//   }
-// };
+
 export const fetchAllCategoryForProduct = async ({token}) => {
   try {
     const response = await Axios.get(`/category/all-category-for-product`, {
