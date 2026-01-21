@@ -19,7 +19,7 @@ export const deletePromo = async ({ id, token }) => {
 };
 
 export const createPromoByAdmin = async ({ data, token }) => {
-  const response = await Axios.post(`/promos/create-promo`, data, {
+  const response = await Axios.post(`/promo-code/add-promo-code-by-admin`, data, {
     headers: {
       Authorization: `EcomToken ${token}`,
     },

@@ -6,6 +6,7 @@ import Label from "../../components/form/Label";
 import Button from "../../components/ui/button/Button";
 import { AuthContext } from "../../context/AuthContext";
 import {
+  createPromoByAdmin,
   getAllCategoryForDiscount,
   getAllProductsForDiscount,
   getAllUsersForDiscount,
@@ -65,33 +66,38 @@ const AddPromoCode = () => {
     };
     fetchProducts();
   }, [auth.token]);
-//   get all users Status
+  //   get all users Status
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const response = await getAllUsersForDiscount({ token: auth.token,customerSearch });
-       setCustomers(response.data);
+        const response = await getAllUsersForDiscount({
+          token: auth.token,
+          customerSearch,
+        });
+        setCustomers(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
     fetchCustomer();
-  }, [auth.token,customerSearch]);
+  }, [auth.token, customerSearch]);
 
   // Filtered lists for search
 
   const filteredProducts = products?.filter((product) =>
-    product.name?.toLowerCase().includes(productSearch.toLowerCase())
+    product.name?.toLowerCase().includes(productSearch.toLowerCase()),
   );
 
   const filteredCategories = categories?.filter((category) =>
-    category.name?.toLowerCase().includes(categorySearch.toLowerCase())
+    category.name?.toLowerCase().includes(categorySearch.toLowerCase()),
   );
 
   const filteredCustomers = customers?.filter(
     (customer) =>
       customer.name?.toLowerCase().includes(customerSearch.toLowerCase()) ||
-      customer?.activeUserStatus?.toLowerCase().includes(customerSearch.toLowerCase())
+      customer?.activeUserStatus
+        ?.toLowerCase()
+        .includes(customerSearch.toLowerCase()),
   );
 
   // Load initial data if in edit mode
@@ -117,10 +123,10 @@ const AddPromoCode = () => {
         type === "checkbox"
           ? checked
           : type === "number"
-          ? value === ""
-            ? null
-            : parseFloat(value)
-          : value,
+            ? value === ""
+              ? null
+              : parseFloat(value)
+            : value,
     }));
 
     // Clear error for this field
@@ -144,7 +150,7 @@ const AddPromoCode = () => {
     });
   };
 
-  const validateForm = () => {
+  const validateForm = async () => {
     const newErrors = {};
 
     if (!formData.code.trim()) {
@@ -187,18 +193,28 @@ const AddPromoCode = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (await validateForm()) {
       // Format dates to ISO string
       const formattedData = {
         ...formData,
         validFrom: formData.validFrom.toISOString(),
         validUntil: formData.validUntil.toISOString(),
       };
-      console.log(formattedData);
-      //   const response = await createPromoByAdmin({
-      //     data: formattedData,
-      //     token: auth.token,
-      //   });
+      const formData2 = new FormData();
+
+      Object.entries(formattedData).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => formData2.append(key, v));
+        } else {
+          formData2.append(key, value);
+        }
+      });
+      // console.log(formattedData);
+      const response = await createPromoByAdmin({
+        data: formData2,
+        token: auth.token,
+      });
+      console.log("Promo created successfully:", response);
       //   onSubmit(formattedData);
     }
   };
@@ -206,7 +222,7 @@ const AddPromoCode = () => {
   const getSelectedItems = (field, sourceArray) => {
     return sourceArray?.filter(
       (item) =>
-        formData[field].includes(item.id) || formData[field].includes(item._id)
+        formData[field].includes(item.id) || formData[field].includes(item._id),
     );
   };
 
@@ -458,15 +474,15 @@ const AddPromoCode = () => {
                     key={product.id}
                     className="flex items-center p-2 hover:bg-gray-500 rounded cursor-pointer"
                     onClick={() =>
-                      handleArrayToggle("applicableProducts", product.id)
+                      handleArrayToggle("applicableProducts", product._id)
                     }
                   >
                     <input
                       type="checkbox"
-                      id={`product-${product.id}`}
-                      checked={formData.applicableProducts.includes(product.id)}
+                      id={`product-${product._id}`}
+                      checked={formData.applicableProducts.includes(product._id)}
                       onChange={() =>
-                        handleArrayToggle("applicableProducts", product.id)
+                        handleArrayToggle("applicableProducts", product._id)
                       }
                     />
                     <Label
@@ -508,7 +524,7 @@ const AddPromoCode = () => {
                           ×
                         </button>
                       </span>
-                    )
+                    ),
                   )}
                 </div>
               </div>
@@ -543,7 +559,7 @@ const AddPromoCode = () => {
                       type="checkbox"
                       id={`category-${category._id}`}
                       checked={formData.applicableCategories.includes(
-                        category._id
+                        category._id,
                       )}
                       onChange={() =>
                         handleArrayToggle("applicableCategories", category._id)
@@ -581,7 +597,7 @@ const AddPromoCode = () => {
                           onClick={() =>
                             handleArrayToggle(
                               "applicableCategories",
-                              category._id
+                              category._id,
                             )
                           }
                           className="ml-2 text-green-600 hover:text-green-800"
@@ -589,7 +605,7 @@ const AddPromoCode = () => {
                           ×
                         </button>
                       </span>
-                    )
+                    ),
                   )}
                 </div>
               </div>
@@ -668,12 +684,11 @@ const AddPromoCode = () => {
                           ×
                         </button>
                       </span>
-                    )
+                    ),
                   )}
                 </div>
               </div>
             )}
-
           </div>
         </div>
 
