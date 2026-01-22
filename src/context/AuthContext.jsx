@@ -1,5 +1,6 @@
 import React, { useEffect, useState, createContext } from "react";
 import { checkUserAuth } from "../service/auth";
+import SweetAlert from "../components/common/SweetAlert";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext(null);
@@ -24,6 +25,17 @@ const AuthContextProvider = ({ children }) => {
         token: token,
       });
       setUserInfo(response.data);
+    }else{
+      setAuth({
+        checkAuth: false,
+        token: "",
+      });
+      setUserInfo({});
+      SweetAlert({
+        title: "Session Expired",
+        text: "Please login again to continue.",
+        icon: "warning",
+      })
     }
   };
   useEffect(() => {

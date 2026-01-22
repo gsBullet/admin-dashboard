@@ -6,10 +6,13 @@ import Label from "../../components/form/Label";
 import Button from "../../components/ui/button/Button";
 import { AuthContext } from "../../context/AuthContext";
 import {
+  createPromoByAdmin,
   getAllCategoryForDiscount,
   getAllProductsForDiscount,
   getAllUsersForDiscount,
 } from "../../service/Promo";
+import LoadingBtn from "../UiElements/LoadingBtn";
+import SweetAlert from "../../components/common/SweetAlert";
 
 const AddPromoCode = () => {
   const { auth } = useContext(AuthContext);
@@ -35,6 +38,7 @@ const AddPromoCode = () => {
   const [productSearch, setProductSearch] = useState("");
   const [categorySearch, setCategorySearch] = useState("");
   const [customerSearch, setCustomerSearch] = useState("");
+  const [loading, setLoading] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [initialData, setInitialData] = useState(null);
   //   const [isEditMode, setIsEditMode] = useState(false);
@@ -43,10 +47,13 @@ const AddPromoCode = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setLoading(true);
         const response = await getAllCategoryForDiscount({ token: auth.token });
         setCategories(response);
       } catch (error) {
         console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCategories();
@@ -56,11 +63,14 @@ const AddPromoCode = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const response = await getAllProductsForDiscount({ token: auth.token });
         console.log(response);
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProducts();
@@ -69,13 +79,12 @@ const AddPromoCode = () => {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const response = await getAllUsersForDiscount({
-          token: auth.token,
-          customerSearch,
-        });
-        setCustomers(response.data);
+        const response = await getAllUsersForDiscount({ token: auth.token,customerSearch });
+       setCustomers(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCustomer();
@@ -84,19 +93,17 @@ const AddPromoCode = () => {
   // Filtered lists for search
 
   const filteredProducts = products?.filter((product) =>
-    product.name?.toLowerCase().includes(productSearch.toLowerCase())
+    product.name?.toLowerCase().includes(productSearch.toLowerCase()),
   );
 
   const filteredCategories = categories?.filter((category) =>
-    category.name?.toLowerCase().includes(categorySearch.toLowerCase())
+    category.name?.toLowerCase().includes(categorySearch.toLowerCase()),
   );
 
   const filteredCustomers = customers?.filter(
     (customer) =>
       customer.name?.toLowerCase().includes(customerSearch.toLowerCase()) ||
-      customer?.activeUserStatus
-        ?.toLowerCase()
-        .includes(customerSearch.toLowerCase())
+      customer?.activeUserStatus?.toLowerCase().includes(customerSearch.toLowerCase())
   );
 
   // Load initial data if in edit mode
@@ -122,10 +129,10 @@ const AddPromoCode = () => {
         type === "checkbox"
           ? checked
           : type === "number"
-          ? value === ""
-            ? null
-            : parseFloat(value)
-          : value,
+            ? value === ""
+              ? null
+              : parseFloat(value)
+            : value,
     }));
 
     // Clear error for this field
@@ -149,7 +156,7 @@ const AddPromoCode = () => {
     });
   };
 
-  const validateForm = () => {
+  const validateForm = async () => {
     const newErrors = {};
 
     if (!formData.code.trim()) {
@@ -192,26 +199,49 @@ const AddPromoCode = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (validateForm()) {
+    if (await validateForm()) {
       // Format dates to ISO string
       const formattedData = {
         ...formData,
         validFrom: formData.validFrom.toISOString(),
         validUntil: formData.validUntil.toISOString(),
       };
-      console.log(formattedData);
-      //   const response = await createPromoByAdmin({
-      //     data: formattedData,
-      //     token: auth.token,
-      //   });
-      //   onSubmit(formattedData);
+      const formData2 = new FormData();
+
+      Object.entries(formattedData).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((v) => formData2.append(key, v));
+        } else {
+          formData2.append(key, value);
+        }
+      });
+
+      try {
+        // console.log(formattedData);
+        const response = await createPromoByAdmin({
+          data: formData2,
+          token: auth.token,
+      });
+      if (response.success) {
+        SweetAlert({
+          icon: "success",
+          title: response.message,
+        });
+      }
+      } catch (error) {
+        SweetAlert({
+          icon: "error",
+          title: error.response?.data?.message,
+        });
+        console.log("Error creating promo code:", error);
+      }
     }
   };
 
   const getSelectedItems = (field, sourceArray) => {
     return sourceArray?.filter(
       (item) =>
-        formData[field].includes(item.id) || formData[field].includes(item._id)
+        formData[field].includes(item.id) || formData[field].includes(item._id),
     );
   };
 
@@ -233,12 +263,10 @@ const AddPromoCode = () => {
     setErrors({});
   };
   return (
-    <>
-      <>
-        <div className="max-w-4xl mx-auto p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 dark:text-white">
-            {"Create New Promo Code"}
-          </h2>
+    <div className="max-w-4xl mx-auto p-6 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 dark:text-white">
+        {"Create New Promo Code"}
+      </h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
@@ -466,75 +494,70 @@ const AddPromoCode = () => {
                   onChange={(e) => setProductSearch(e.target.value)}
                 />
 
-                <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
-                  {filteredProducts?.length > 0 ? (
-                    filteredProducts?.map((product) => (
-                      <div
+            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
+              {filteredProducts?.length > 0 ? (
+                filteredProducts?.map((product) => (
+                  <div
+                    key={product.id}
+                    className="flex items-center p-2 hover:bg-gray-500 rounded cursor-pointer"
+                    onClick={() =>
+                      handleArrayToggle("applicableProducts", product.id)
+                    }
+                  >
+                    <input
+                      type="checkbox"
+                      id={`product-${product.id}`}
+                      checked={formData.applicableProducts.includes(product.id)}
+                      onChange={() =>
+                        handleArrayToggle("applicableProducts", product.id)
+                      }
+                    />
+                    <Label
+                      htmlFor={`product-${product.id}`}
+                      className="ml-2 text-sm text-gray-700 dark:text-white/90 flex-1 cursor-pointer"
+                    >
+                      {product.name} - ${product.new_price}
+                    </Label>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm p-2 dark:text-white/90">
+                  No products found
+                </p>
+              )}
+            </div>
+
+            {/* Selected Products */}
+            {formData.applicableProducts.length > 0 && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2 dark:text-white/90">
+                  Selected Products:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {getSelectedItems("applicableProducts", products).map(
+                    (product) => (
+                      <span
                         key={product.id}
-                        className="flex items-center p-2 hover:bg-gray-500 rounded cursor-pointer"
-                        onClick={() =>
-                          handleArrayToggle("applicableProducts", product.id)
-                        }
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
                       >
-                        <input
-                          type="checkbox"
-                          id={`product-${product.id}`}
-                          checked={formData.applicableProducts.includes(
-                            product.id
-                          )}
-                          onChange={() =>
+                        {product.name}
+                        <button
+                          type="button"
+                          onClick={() =>
                             handleArrayToggle("applicableProducts", product.id)
                           }
-                        />
-                        <Label
-                          htmlFor={`product-${product.id}`}
-                          className="ml-2 text-sm text-gray-700 dark:text-white/90 flex-1 cursor-pointer"
+                          className="ml-2 text-blue-600 hover:text-blue-800"
                         >
-                          {product.name} - ${product.new_price}
-                        </Label>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-sm p-2 dark:text-white/90">
-                      No products found
-                    </p>
+                          ×
+                        </button>
+                      </span>
+                    )
                   )}
                 </div>
-
-                {/* Selected Products */}
-                {formData.applicableProducts.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2 dark:text-white/90">
-                      Selected Products:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {getSelectedItems("applicableProducts", products).map(
-                        (product) => (
-                          <span
-                            key={product.id}
-                            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
-                          >
-                            {product.name}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleArrayToggle(
-                                  "applicableProducts",
-                                  product.id
-                                )
-                              }
-                              className="ml-2 text-blue-600 hover:text-blue-800"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
-            </div>
+            )}
+          </div>
+        </div>
 
             {/* Applicable Categories */}
             <div className="border-t pt-6">
@@ -549,81 +572,73 @@ const AddPromoCode = () => {
                   onChange={(e) => setCategorySearch(e.target.value)}
                 />
 
-                <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
-                  {filteredCategories.length > 0 ? (
-                    filteredCategories.map((category) => (
-                      <div
+            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
+              {filteredCategories.length > 0 ? (
+                filteredCategories.map((category) => (
+                  <div
+                    key={category._id}
+                    className="flex items-center p-2 dark:hover:bg-gray-500 hover:bg-gray-200 rounded cursor-pointer"
+                    onClick={() =>
+                      handleArrayToggle("applicableCategories", category._id)
+                    }
+                  >
+                    <input
+                      type="checkbox"
+                      id={`category-${category._id}`}
+                      checked={formData.applicableCategories.includes(
+                        category._id
+                      )}
+                      onChange={() =>
+                        handleArrayToggle("applicableCategories", category._id)
+                      }
+                    />
+                    <Label
+                      htmlFor={`category-${category._id}`}
+                      className="ml-2 text-sm text-gray-700 dark:text-white/90 cursor-pointer "
+                    >
+                      {category.name}
+                    </Label>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm p-2">No categories found</p>
+              )}
+            </div>
+
+            {/* Selected Categories */}
+            {formData.applicableCategories.length > 0 && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2  dark:text-white/90">
+                  Selected Categories:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {getSelectedItems("applicableCategories", categories).map(
+                    (category) => (
+                      <span
                         key={category._id}
-                        className="flex items-center p-2 dark:hover:bg-gray-500 hover:bg-gray-200 rounded cursor-pointer"
-                        onClick={() =>
-                          handleArrayToggle(
-                            "applicableCategories",
-                            category._id
-                          )
-                        }
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800"
                       >
-                        <input
-                          type="checkbox"
-                          id={`category-${category._id}`}
-                          checked={formData.applicableCategories.includes(
-                            category._id
-                          )}
-                          onChange={() =>
+                        {category.name}
+                        <button
+                          type="button"
+                          onClick={() =>
                             handleArrayToggle(
                               "applicableCategories",
                               category._id
                             )
                           }
-                        />
-                        <Label
-                          htmlFor={`category-${category._id}`}
-                          className="ml-2 text-sm text-gray-700 dark:text-white/90 cursor-pointer "
+                          className="ml-2 text-green-600 hover:text-green-800"
                         >
-                          {category.name}
-                        </Label>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-sm p-2">
-                      No categories found
-                    </p>
+                          ×
+                        </button>
+                      </span>
+                    )
                   )}
                 </div>
-
-                {/* Selected Categories */}
-                {formData.applicableCategories.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2  dark:text-white/90">
-                      Selected Categories:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {getSelectedItems("applicableCategories", categories).map(
-                        (category) => (
-                          <span
-                            key={category._id}
-                            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800"
-                          >
-                            {category.name}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleArrayToggle(
-                                  "applicableCategories",
-                                  category._id
-                                )
-                              }
-                              className="ml-2 text-green-600 hover:text-green-800"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
-            </div>
+            )}
+          </div>
+        </div>
 
             {/* Specific Customers */}
             <div className="border-t pt-6">
@@ -641,75 +656,69 @@ const AddPromoCode = () => {
                   onChange={(e) => setCustomerSearch(e.target.value)}
                 />
 
-                <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
-                  {filteredCustomers?.length > 0 ? (
-                    filteredCustomers?.map((customer) => (
-                      <div
+            <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md p-2">
+              {filteredCustomers?.length > 0 ? (
+                filteredCustomers?.map((customer) => (
+                  <div
+                    key={customer._id}
+                    className="flex items-center p-2 dark:hover:bg-gray-500 hover:bg-gray-200 rounded "
+                  >
+                    <input
+                      type="checkbox"
+                      id={`customer-${customer._id}`}
+                      checked={formData.customerSpecific.includes(customer._id)}
+                      onChange={() =>
+                        handleArrayToggle("customerSpecific", customer._id)
+                      }
+                    />
+                    <Label
+                      htmlFor={`customer-${customer._id}`}
+                      className="ml-2 text-sm text-gray-700 flex-1 dark:text-white/90 cursor-pointer"
+                    >
+                      <div className="font-medium">{customer.name}</div>
+                      <div className="text-gray-500 dark:text-white/90">
+                        {customer.email}
+                      </div>
+                    </Label>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm p-2">No customers found</p>
+              )}
+            </div>
+
+            {/* Selected Customers */}
+            {formData.customerSpecific?.length > 0 && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2 dark:text-white/90">
+                  Selected Customers:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {getSelectedItems("customerSpecific", customers)?.map(
+                    (customer) => (
+                      <span
                         key={customer._id}
-                        className="flex items-center p-2 dark:hover:bg-gray-500 hover:bg-gray-200 rounded "
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800"
                       >
-                        <input
-                          type="checkbox"
-                          id={`customer-${customer._id}`}
-                          checked={formData.customerSpecific.includes(
-                            customer._id
-                          )}
-                          onChange={() =>
+                        {customer.name}
+                        <button
+                          type="button"
+                          onClick={() =>
                             handleArrayToggle("customerSpecific", customer._id)
                           }
-                        />
-                        <Label
-                          htmlFor={`customer-${customer._id}`}
-                          className="ml-2 text-sm text-gray-700 flex-1 dark:text-white/90 cursor-pointer"
+                          className="ml-2 text-purple-600 hover:text-purple-800"
                         >
-                          <div className="font-medium">{customer.name}</div>
-                          <div className="text-gray-500 dark:text-white/90">
-                            {customer.email}
-                          </div>
-                        </Label>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-sm p-2">
-                      No customers found
-                    </p>
+                          ×
+                        </button>
+                      </span>
+                    )
                   )}
                 </div>
-
-                {/* Selected Customers */}
-                {formData.customerSpecific?.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2 dark:text-white/90">
-                      Selected Customers:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {getSelectedItems("customerSpecific", customers)?.map(
-                        (customer) => (
-                          <span
-                            key={customer._id}
-                            className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800"
-                          >
-                            {customer.name}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleArrayToggle(
-                                  "customerSpecific",
-                                  customer._id
-                                )
-                              }
-                              className="ml-2 text-purple-600 hover:text-purple-800"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
-            </div>
+            )}
+
+          </div>
+        </div>
 
             {/* Active Status */}
             <div className="border-t pt-6">
@@ -735,28 +744,22 @@ const AddPromoCode = () => {
               </p>
             </div>
 
-            {/* Form Actions */}
-            <div className="border-t pt-6 flex justify-end space-x-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => window.history.back()}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleReset()}
-              >
-                Reset
-              </Button>
-              <Button type="submit">{"Create Promo Code"}</Button>
-            </div>
-          </form>
+        {/* Form Actions */}
+        <div className="border-t pt-6 flex justify-end space-x-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => window.history.back()}
+          >
+            Cancel
+          </Button>
+          <Button type="button" variant="outline" onClick={() => handleReset()}>
+            Reset
+          </Button>
+          <Button type="submit">{"Create Promo Code"}</Button>
         </div>
-      </>
-    </>
+      </form>
+    </div>
   );
 };
 
