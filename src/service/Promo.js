@@ -1,11 +1,26 @@
 import Axios from "./Axios";
 
-export const getAllPromos = async ({ token }) => {
-  const response = await Axios.get(`/promos/get-all-promos`, {
-    headers: {
-      Authorization: `EcomToken ${token}`,
+export const getAllPromos = async ({ token, limit, page, search }) => {
+  const response = await Axios.get(
+    `/promo-codes/get-all-promo-codes?limit=${limit}&page=${page}&search=${search}`,
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
     },
-  });
+  );
+  return response.data;
+};
+export const changePromoStatus = async ({ token, id, isActive }) => {
+  const response = await Axios.patch(
+    `/promo-codes/change-promo-status/${id}`,
+    { isActive },
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    },
+  );
   return response.data;
 };
 
@@ -19,11 +34,15 @@ export const deletePromo = async ({ id, token }) => {
 };
 
 export const createPromoByAdmin = async ({ data, token }) => {
-  const response = await Axios.post(`/promo-code/add-promo-code-by-admin`, data, {
-    headers: {
-      Authorization: `EcomToken ${token}`,
+  const response = await Axios.post(
+    `/promo-code/add-promo-code-by-admin`,
+    data,
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
     },
-  });
+  );
   return response.data;
 };
 
@@ -62,11 +81,14 @@ export const getAllProductsForDiscount = async ({ token }) => {
 };
 export const getAllUsersForDiscount = async ({ token, customerSearch }) => {
   try {
-    const response = await Axios.get(`/general-users/discount-for-users?customerSearch=${customerSearch}`, {
-      headers: {
-        authorization: `EcomToken ${token}`,
+    const response = await Axios.get(
+      `/general-users/discount-for-users?customerSearch=${customerSearch}`,
+      {
+        headers: {
+          authorization: `EcomToken ${token}`,
+        },
       },
-    });
+    );
     if (response.data.data) {
       return response.data;
     } else {

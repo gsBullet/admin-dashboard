@@ -27,7 +27,7 @@ const Button = ({
     warning:
       "bg-warning-500 text-white shadow-theme-xs hover:bg-warning-600 disabled:bg-warning-300",
     success:
-      "bg-success-500 text-white shadow-theme-xs hover:bg-success-600 disabled:bg-success-300",
+      "bg-success-800 text-white shadow-theme-xs hover:bg-success-900 disabled:bg-success-900",
   };
 
   return (
