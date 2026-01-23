@@ -25,7 +25,7 @@ export const changePromoStatus = async ({ token, id, isActive }) => {
 };
 
 export const deletePromo = async ({ id, token }) => {
-  const response = await Axios.get(`/promos/delete-promo/${id}`, {
+  const response = await Axios.get(`/promo-codes/delete-promo-code/${id}`, {
     headers: {
       Authorization: `EcomToken ${token}`,
     },
@@ -36,6 +36,18 @@ export const deletePromo = async ({ id, token }) => {
 export const createPromoByAdmin = async ({ data, token }) => {
   const response = await Axios.post(
     `/promo-code/add-promo-code-by-admin`,
+    data,
+    {
+      headers: {
+        Authorization: `EcomToken ${token}`,
+      },
+    },
+  );
+  return response.data;
+};
+export const updatePromoByAdmin = async ({ id, data, token }) => {
+  const response = await Axios.post(
+    `/promo-code/update-promo-code-by-admin/${id}`,
     data,
     {
       headers: {

@@ -2,7 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import { format } from "date-fns";
 import { Link } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
-import { changePromoStatus, getAllPromos } from "../../service/Promo";
+import {
+  changePromoStatus,
+  deletePromo,
+  getAllPromos,
+} from "../../service/Promo";
 import LoadingBtn from "../UiElements/LoadingBtn";
 import PageMeta from "../../components/common/PageMeta";
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
@@ -13,6 +17,7 @@ import SweetAlert from "../../components/common/SweetAlert";
 import Button from "../../components/ui/button/Button";
 import PromoCodeModal from "./modal/PromoCodeModal";
 import TablePagination from "../Tables/TablePagination";
+import DeleteConfirm from "../../components/common/DeleteConfirm";
 
 const PromoCodeList = () => {
   const { auth } = useContext(AuthContext);
@@ -56,15 +61,31 @@ const PromoCodeList = () => {
 
     fetchPromoCodes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth.token, currentPage, limit, searchTerm]);
+  }, [auth.token, currentPage, limit, searchTerm, isOpen]);
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this promo code?")) {
-      try {
-        await fetch(`/api/promocodes/${id}`, { method: "DELETE" });
-      } catch (error) {
-        console.error("Error deleting promo code:", error);
+    try {
+      const response = await deletePromo({ id, token: auth.token });
+      if (response.success) {
+        SweetAlert({
+          title: response.message,
+          icon: "success",
+        });
+        setPromoCodes((prevCodes) =>
+          prevCodes.filter((promo) => promo._id !== id),
+        );
+      } else {
+        SweetAlert({
+          title: response.message,
+          icon: "error",
+        });
       }
+    } catch (error) {
+      SweetAlert({
+        title: error.response?.data?.message || "Error deleting promo code",
+        icon: "error",
+      });
+      console.error("Error deleting promo code:", error);
     }
   };
 

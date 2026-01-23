@@ -14,7 +14,7 @@ const DeleteConfirm = ({icon, successTitle}) => {
     if (result.isConfirmed) {
       return Swal.fire({
         title: successTitle,
-        text: "Your file has been deleted.",
+        text: "Your file has been deleted Permanently.",
         icon: icon,
       });
     }

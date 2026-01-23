@@ -7,6 +7,7 @@ import {
   getAllCategoryForDiscount,
   getAllProductsForDiscount,
   getAllUsersForDiscount,
+  updatePromoByAdmin,
 } from "../../../service/Promo";
 import { useContext } from "react";
 import { AuthContext } from "../../../context/AuthContext";
@@ -17,7 +18,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Button from "../../../components/ui/button/Button";
 
 const PromoCodeModal = ({ isOpen, setIsOpen, data }) => {
-  console.log(data);
+  // console.log(data);
 
   const { auth } = useContext(AuthContext);
   const [categories, setCategories] = useState([]);
@@ -35,15 +36,9 @@ const PromoCodeModal = ({ isOpen, setIsOpen, data }) => {
       : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
     usageLimit: data?.usageLimit || null,
     isActive: data?.isActive || true,
-    applicableProducts: [
-        ...(data?.applicableProducts || []),
-    ],
-    applicableCategories: [
-        ...(data?.applicableCategories || []),
-    ],
-    customerSpecific: [
-        ...(data?.customerSpecific || []),
-    ],
+    applicableProducts: [...(data?.applicableProducts || [])],
+    applicableCategories: [...(data?.applicableCategories || [])],
+    customerSpecific: [...(data?.customerSpecific || [])],
   });
 
   const [errors, setErrors] = useState({});
@@ -222,7 +217,7 @@ const PromoCodeModal = ({ isOpen, setIsOpen, data }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+  const handleUpdatePromoCode = async (e) => {
     e.preventDefault();
 
     if (await validateForm()) {
@@ -243,8 +238,9 @@ const PromoCodeModal = ({ isOpen, setIsOpen, data }) => {
       });
 
       try {
-        // console.log(formattedData);
-        const response = await createPromoByAdmin({
+        setLoading(true);
+        const response = await updatePromoByAdmin({
+          id: data._id,
           data: formData2,
           token: auth.token,
         });
@@ -254,12 +250,15 @@ const PromoCodeModal = ({ isOpen, setIsOpen, data }) => {
             title: response.message,
           });
         }
+        setIsOpen(false);
       } catch (error) {
         SweetAlert({
           icon: "error",
           title: error.response?.data?.message,
         });
         console.log("Error creating promo code:", error);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -300,7 +299,7 @@ const PromoCodeModal = ({ isOpen, setIsOpen, data }) => {
             {"Edit Promo Code"}
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleUpdatePromoCode} className="space-y-6">
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Promo Code */}
@@ -723,7 +722,6 @@ const PromoCodeModal = ({ isOpen, setIsOpen, data }) => {
                           className="ml-2 text-sm text-gray-700 flex-1 dark:text-white/90 cursor-pointer"
                         >
                           <div className="font-medium">{customer.name}</div>
-                          
                         </Label>
                       </div>
                     ))
@@ -785,7 +783,9 @@ const PromoCodeModal = ({ isOpen, setIsOpen, data }) => {
               >
                 Reset
               </Button>
-              <Button type="submit">{"Create Promo Code"}</Button>
+              <Button disabled={loading} type="submit">
+                Update Promo Code
+              </Button>
             </div>
           </form>
         </div>
