@@ -50,7 +50,7 @@ const PendingOrders = () => {
   const [orderDetails, setOrderDetails] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [pendingOrderByDate, setPendingOrderByDate] = useState([]);
-  console.log(dateByOrders);
+  // console.log(dateByOrders);
 
   useEffect(() => {
     const fetchPendingOrders = async () => {
@@ -364,7 +364,7 @@ const PendingOrders = () => {
 
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
                           <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                            {order.quantity}
+                            {order.totalQuantity}
                           </span>
                         </TableCell>
                         <TableCell className="px-5 py-4 sm:px-6 text-start">
