@@ -6,12 +6,14 @@ import Badge from "../../components/ui/badge/Badge";
 import bdTimeFormat from "../../components/common/bdTimeFormat";
 
 const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
+  // console.log("orderInfo:", orderInfo);
+
   const {
     status,
     paymentMethod,
-    // quantity,
+    // payAmount,
     trxId,
-    // totalAmount,
+    deliveryFee,
     createdAt,
     customerId,
   } = orderInfo || {};
@@ -23,7 +25,12 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
   const [items, setItems] = useState(products);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  console.log(customer);
+  const dFee = deliveryFee
+    ? Number(deliveryFee)
+    : customer?.deliveryMethod === "inside-dhaka"
+      ? 60
+      : 120;
+  console.log(dFee);
 
   /* ---------------- INIT ---------------- */
   useEffect(() => {
@@ -50,12 +57,17 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
   /* ---------------- CALC ---------------- */
   const quantity = useMemo(
     () => items.reduce((sum, p) => sum + (p.quantity || 0), 0),
-    [items]
+    [items],
   );
 
   const totalAmount = useMemo(
-    () => items.reduce((sum, p) => sum + (p.quantity || 0) * (p.price || 0), 0),
-    [items]
+    () =>
+      items.reduce(
+        (sum, p) =>
+          sum + (p.quantity || 0) * (p.price || 0) + (deliveryFee || 0),
+        0,
+      ),
+    [items],
   );
 
   /* ---------------- SUBMIT ---------------- */
@@ -72,8 +84,6 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
     payload.products.totalAmount = totalAmount;
     try {
       console.log("SUBMIT DATA 👉", payload);
-      // await axios.put(`/orders/${orderInfo._id}`, payload);
-
       alert("Order updated successfully!");
       setIsEditOpen(false);
     } catch (err) {
@@ -208,17 +218,14 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
                       Delivery Method
                     </label>
-                    <Select
-                      defaultValue={customer.deliveryMethod}
+                    <Input
+                      type="text"
+                      value={customer.deliveryMethod}
                       onChange={(val) =>
                         handleCustomerInfoChange("deliveryMethod", val)
                       }
-                      options={[
-                        { value: "inside-dhaka", label: "Inside Dhaka" },
-                        { value: "outside-dhaka", label: "Outside Dhaka" },
-                        { value: "international", label: "International" },
-                      ]}
-                    ></Select>
+                      disabled
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1 dark:text-white/90">
@@ -252,6 +259,9 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                           Product Name
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
+                          Size
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
                           Category
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium  uppercase tracking-wider">
@@ -279,6 +289,9 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                             {product?.productId?.name}
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-900 dark:text-white/90">
+                            {product?.size || "N/A"}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-900 dark:text-white/90">
                             {product?.productId?.category?.name}
                           </td>
                           <td className="px-4 py-3">
@@ -290,7 +303,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                                 handleProductChange(
                                   index,
                                   "quantity",
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
                               className="w-20 "
@@ -322,7 +335,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                                   handleProductChange(
                                     index,
                                     "price",
-                                    e.target.value
+                                    e.target.value,
                                   )
                                 }
                                 disabled
@@ -370,7 +383,7 @@ const EditPendingOrder = ({ isEditOpen, setIsEditOpen, orderInfo }) => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-white/90 mb-1">
                       Delivery Cost ($)
                     </label>
-                    <Input type="text" value={totalAmount} disabled />
+                    <Input type="text" value={deliveryFee} disabled />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white/90 mb-1">
